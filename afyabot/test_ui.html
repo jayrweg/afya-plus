@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Afyabot Test UI</title>
+<style>
+body { font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 40px auto; background: #f0fdf4; color: #111827; }
+#chat { border: 1px solid #d1fae5; padding: 20px; background: white; border-radius: 12px; min-height: 300px; }
+#log { margin-top: 20px; max-height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; padding: 12px; background: #f9fafb; border-radius: 8px; font-family: monospace; font-size: 12px; }
+.msg { margin: 8px 0; line-height: 1.5; }
+.user { color: #059669; text-align: right; font-weight: 500; }
+.bot { color: #1f2937; }
+.buttons { margin: 12px 0; display: flex; flex-wrap: wrap; gap: 8px; }
+button { background: #10b981; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: background 0.2s; }
+button:hover { background: #059669; }
+input[type=text] { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; margin-top: 8px; }
+input[type=text]:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+</style>
+</head>
+<body>
+<h1 style="text-align: center; color: #047857;">Afyabot Test UI</h1>
+<div id="chat"></div>
+<div id="log"></div>
+<script>
+const chat = document.getElementById('chat');
+const log = document.getElementById('log');
+
+function append(msg, cls = 'bot') {
+  const div = document.createElement('div');
+  div.className = `msg ${cls}`;
+  div.innerHTML = msg.replace(/\n/g, '<br>');
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+function logEvent(txt) {
+  const div = document.createElement('div');
+  div.textContent = new Date().toLocaleTimeString() + ' ' + txt;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+async function send(userMsg) {
+  append(userMsg, 'user');
+  logEvent('USER: ' + userMsg);
+  const r = await fetch('/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({message: userMsg, session_id: window.sessionId})
+  });
+  const data = await r.json();
+  window.sessionId = data.session_id;
+  append(data.reply, 'bot');
+  logEvent('BOT: ' + data.reply);
+  logEvent('SESSION: ' + JSON.stringify(data));
+  renderControls(data.reply);
+}
+function renderControls(reply) {
+  // Remove any existing controls first
+  const existingControls = chat.querySelectorAll('.buttons');
+  existingControls.forEach(el => el.remove());
+  
+  const btns = document.createElement('div');
+  btns.className = 'buttons';
+  
+  // Check for numbered options like "1) ", "2) ", etc.
+  const lines = reply.split('\n');
+  const numberedOptions = [];
+  
+  lines.forEach(line => {
+    const match = line.match(/^(\d+)\)\s*(.+)$/);
+    if (match) {
+      numberedOptions.push({
+        number: match[1],
+        text: match[2]
+      });
+    }
+  });
+  
+  if (numberedOptions.length > 0) {
+    numberedOptions.forEach(option => {
+      const b = document.createElement('button');
+      b.textContent = option.number + ')';
+      b.onclick = () => send(option.number);
+      btns.appendChild(b);
+    });
+  } else if (reply.toLowerCase().includes('name') || reply.toLowerCase().includes('jina')) {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = 'Enter your name / Jina lako';
+    const btn = document.createElement('button');
+    btn.textContent = 'Send';
+    btn.onclick = () => {
+      if (inp.value.trim()) send(inp.value.trim());
+    };
+    inp.onkeydown = e => { if (e.key === 'Enter') btn.click(); };
+    btns.appendChild(inp);
+    btns.appendChild(btn);
+  } else if (reply.toLowerCase().includes('phone') || reply.toLowerCase().includes('namba') || reply.toLowerCase().includes('number')) {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = 'Enter your phone number / Namba yako';
+    const btn = document.createElement('button');
+    btn.textContent = 'Send';
+    btn.onclick = () => {
+      if (inp.value.trim()) send(inp.value.trim());
+    };
+    inp.onkeydown = e => { if (e.key === 'Enter') btn.click(); };
+    btns.appendChild(inp);
+    btns.appendChild(btn);
+  } else if (reply.toLowerCase().includes('pay') || reply.toLowerCase().includes('payment') || reply.toLowerCase().includes('order id')) {
+    // Show payment iframe or link
+    const payDiv = document.createElement('div');
+    payDiv.style.marginTop = '10px';
+    payDiv.innerHTML = `
+      <p><strong>Payment Options:</strong></p>
+      <button onclick="window.open('${reply.match(/https?:\/\/[^\s]+/)?.[0] || '#'}', '_blank')">Pay in New Window</button>
+      <button onclick="showPaymentIframe('${reply.match(/https?:\/\/[^\s]+/)?.[0] || '#'}')">Pay Here (iframe)</button>
+    `;
+    btns.appendChild(payDiv);
+  } else {
+    // Fallback: always show a generic text input
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = 'Type your message...';
+    const btn = document.createElement('button');
+    btn.textContent = 'Send';
+    btn.onclick = () => {
+      if (inp.value.trim()) send(inp.value.trim());
+    };
+    inp.onkeydown = e => { if (e.key === 'Enter') btn.click(); };
+    btns.appendChild(inp);
+    btns.appendChild(btn);
+  }
+  chat.appendChild(btns);
+}
+
+function showPaymentIframe(url) {
+  const iframe = document.createElement('iframe');
+  iframe.src = url;
+  iframe.style.width = '100%';
+  iframe.style.height = '400px';
+  iframe.style.border = '1px solid #d1d5db';
+  iframe.style.borderRadius = '8px';
+  iframe.style.marginTop = '10px';
+  
+  const iframeDiv = document.createElement('div');
+  iframeDiv.appendChild(iframe);
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Close Payment';
+  closeBtn.style.marginTop = '10px';
+  closeBtn.onclick = () => iframeDiv.remove();
+  iframeDiv.appendChild(closeBtn);
+  
+  chat.appendChild(iframeDiv);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// Start
+append('Bot: Send "hi" to start');
+renderControls('Send "hi" to start');
+</script>
+</body>
+</html>
