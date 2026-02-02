@@ -22,23 +22,27 @@ def send_whatsapp_text(*, phone_number_id: str, to: str, message: str) -> Option
         "text": {"body": message},
     }
 
-    data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
+    try:
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
 
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        raw = resp.read().decode("utf-8", errors="replace")
-        try:
-            return json.loads(raw)
-        except Exception:
-            return {"raw": raw, "status": resp.status}
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            raw = resp.read().decode("utf-8", errors="replace")
+            try:
+                return json.loads(raw)
+            except Exception:
+                return {"raw": raw, "status": resp.status}
+    except Exception as e:
+        print(f"Error sending WhatsApp message: {e}")
+        return None
 
 
 def send_whatsapp_buttons(*, phone_number_id: str, to: str, message: str, buttons: List[Dict[str, str]]) -> Optional[Dict[str, Any]]:
@@ -75,23 +79,27 @@ def send_whatsapp_buttons(*, phone_number_id: str, to: str, message: str, button
         }
     }
 
-    data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
+    try:
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
 
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        raw = resp.read().decode("utf-8", errors="replace")
-        try:
-            return json.loads(raw)
-        except Exception:
-            return {"raw": raw, "status": resp.status}
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            raw = resp.read().decode("utf-8", errors="replace")
+            try:
+                return json.loads(raw)
+            except Exception:
+                return {"raw": raw, "status": resp.status}
+    except Exception as e:
+        print(f"Error sending WhatsApp buttons: {e}")
+        return None
 
 
 def send_whatsapp_list(*, phone_number_id: str, to: str, message: str, sections: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -134,20 +142,24 @@ def send_whatsapp_list(*, phone_number_id: str, to: str, message: str, sections:
         }
     }
 
-    data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
+    try:
+        data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
 
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        raw = resp.read().decode("utf-8", errors="replace")
-        try:
-            return json.loads(raw)
-        except Exception:
-            return {"raw": raw, "status": resp.status}
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            raw = resp.read().decode("utf-8", errors="replace")
+            try:
+                return json.loads(raw)
+            except Exception:
+                return {"raw": raw, "status": resp.status}
+    except Exception as e:
+        print(f"Error sending WhatsApp list: {e}")
+        return None
