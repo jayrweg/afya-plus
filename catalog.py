@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict
 
-from .types import Language
+from types import Language
 
 
 _TEXT: Dict[Language, Dict[str, str]] = {

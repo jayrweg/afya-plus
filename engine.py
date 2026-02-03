@@ -6,11 +6,11 @@ import uuid
 from dataclasses import replace
 from typing import Dict, Tuple
 
-from .catalog import t
-from .order_store import InMemoryOrderStore
-from .payments import DummyPaymentProvider
-from .pesapal_provider import PesapalPaymentProvider, PesapalConfig
-from .types import Language, Order, Session, Stage
+from catalog import t
+from order_store import InMemoryOrderStore
+from payments import DummyPaymentProvider
+from pesapal_provider import PesapalPaymentProvider, PesapalConfig
+from types import Language, Order, Session, Stage
 
 
 class AfyabotEngine:

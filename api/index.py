@@ -12,8 +12,8 @@ load_dotenv()
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import your existing engine and WhatsApp functions
-from afyabot.engine import AfyabotEngine
-from afyabot.whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
+from engine import AfyabotEngine
+from whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
 
 app = FastAPI(title="Afyabot Health Chatbot")
 
