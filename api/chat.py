@@ -7,8 +7,8 @@ load_dotenv()
 
 # Import your existing engine
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from afyabot.engine import AfyabotEngine
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from afyabot.afyabot.engine import AfyabotEngine
 
 _ENGINE = AfyabotEngine()
 
