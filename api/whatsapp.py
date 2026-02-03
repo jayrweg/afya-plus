@@ -3,13 +3,13 @@ import os
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv('.env.local')
 
 # Import your existing engine and WhatsApp functions
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from afyabot.afyabot.engine import AfyabotEngine
-from afyabot.afyabot.whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
+from afyabot.engine import AfyabotEngine
+from afyabot.whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
 
 _ENGINE = AfyabotEngine()
 
