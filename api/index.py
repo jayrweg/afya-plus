@@ -28,11 +28,86 @@ async def health_check():
 async def root():
     """Serve the main UI"""
     try:
-        with open('public/index.html', 'r', encoding='utf-8') as f:
-            content = f.read()
-        return HTMLResponse(content=content)
-    except FileNotFoundError:
-        return HTMLResponse("<h1>Afyabot</h1><p>UI file not found</p>", status_code=404)
+        # Try different possible paths for the HTML file
+        possible_paths = [
+            'public/index.html',
+            '../public/index.html',
+            '/var/task/public/index.html',
+            '/vercel/path0/public/index.html'
+        ]
+        
+        content = None
+        for path in possible_paths:
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                break
+            except FileNotFoundError:
+                continue
+        
+        if content:
+            return HTMLResponse(content=content)
+        else:
+            # Fallback: simple HTML interface
+            return HTMLResponse("""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Afyabot - Health Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .chat-container { border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+        input, button { padding: 10px; margin: 5px; }
+        #messages { max-height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Afyabot - Health Chatbot</h1>
+    <div class="chat-container">
+        <div id="messages"></div>
+        <div>
+            <input type="text" id="messageInput" placeholder="Type your message..." style="width: 70%;">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const messages = document.getElementById('messages');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            messages.innerHTML += '<p><strong>You:</strong> ' + message + '</p>';
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, session_id: 'web-user' })
+                });
+                
+                const data = await response.json();
+                messages.innerHTML += '<p><strong>Afyabot:</strong> ' + data.reply + '</p>';
+            } catch (error) {
+                messages.innerHTML += '<p><strong>Error:</strong> ' + error.message + '</p>';
+            }
+            
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
+            """)
+    except Exception as e:
+        return HTMLResponse(f"<h1>Afyabot</h1><p>Error: {str(e)}</p>", status_code=500)
 
 @app.post("/chat")
 async def chat_endpoint(request: Request):
