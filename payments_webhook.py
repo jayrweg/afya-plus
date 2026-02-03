@@ -7,7 +7,7 @@ from typing import Any, Dict
 from .email_sender import send_payment_confirmation_email
 from .order_store import InMemoryOrderStore
 from .pesapal_provider import PesapalPaymentProvider, PesapalConfig
-from .types import Session
+from afyabot_types import Session
 
 
 def handle_pesapal_webhook(payload: Dict[str, Any], store: InMemoryOrderStore, sessions: Dict[str, Session]) -> Dict[str, Any]:

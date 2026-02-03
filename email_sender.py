@@ -5,7 +5,7 @@ import os
 import urllib.request
 from typing import Any, Dict
 
-from .types import Order, Session
+from afyabot_types import Order, Session
 
 
 def send_payment_confirmation_email(to_email: str, session: Session, order: Order) -> bool:

@@ -10,7 +10,7 @@ from catalog import t
 from order_store import InMemoryOrderStore
 from payments import DummyPaymentProvider
 from pesapal_provider import PesapalPaymentProvider, PesapalConfig
-from types import Language, Order, Session, Stage
+from afyabot_types import Language, Order, Session, Stage
 
 
 class AfyabotEngine:

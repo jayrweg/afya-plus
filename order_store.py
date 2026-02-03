@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Optional
 
-from types import Order
+from afyabot_types import Order
 
 
 class InMemoryOrderStore:
