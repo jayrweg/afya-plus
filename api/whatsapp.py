@@ -24,6 +24,12 @@ def handler(request):
             challenge = query.get('hub.challenge', '')
             verify_token = os.getenv("WHATSAPP_VERIFY_TOKEN", "")
             
+            print(f"[DEBUG] Webhook verification:")
+            print(f"  Mode: {mode}")
+            print(f"  Token: {token}")
+            print(f"  Expected: {verify_token}")
+            print(f"  Challenge: {challenge}")
+            
             if mode == 'subscribe' and token and verify_token and token == verify_token:
                 return {
                     'statusCode': 200,
