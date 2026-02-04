@@ -132,14 +132,34 @@ async def chat_endpoint(request: Request):
 @app.get("/api/whatsapp/webhook")
 async def whatsapp_webhook_get(request: Request):
     """WhatsApp webhook verification"""
+    # Log the incoming verification request for debugging
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    
     mode = request.query_params.get('hub.mode', '')
     token = request.query_params.get('hub.verify_token', '')
     challenge = request.query_params.get('hub.challenge', '')
     verify_token = os.getenv("WHATSAPP_VERIFY_TOKEN", "")
     
+    logger.info("=== WHATSAPP WEBHOOK VERIFICATION REQUEST ===")
+    logger.info(f"Request URL: {request.url}")
+    logger.info(f"Query params: {dict(request.query_params)}")
+    logger.info(f"Mode: '{mode}'")
+    logger.info(f"Token from Facebook: '{token}'")
+    logger.info(f"Expected verify token: '{verify_token}'")
+    logger.info(f"Challenge: '{challenge}'")
+    
     if mode == 'subscribe' and token and verify_token and token == verify_token:
+        logger.info("✅ WEBHOOK VERIFICATION SUCCESSFUL")
+        logger.info(f"Returning challenge: {challenge}")
         return PlainTextResponse(content=challenge)
     else:
+        logger.error("❌ WEBHOOK VERIFICATION FAILED")
+        logger.error(f"Mode check: {mode == 'subscribe'}")
+        logger.error(f"Token check: {token == verify_token}")
+        logger.error(f"Token provided: '{token}'")
+        logger.error(f"Token expected: '{verify_token}'")
         return PlainTextResponse(content="Verification failed", status_code=403)
 
 @app.post("/api/whatsapp/webhook")
@@ -150,6 +170,14 @@ async def whatsapp_webhook_post(request: Request):
         import logging
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger(__name__)
+        
+        logger.info("=== WHATSAPP WEBHOOK POST REQUEST ===")
+        logger.info(f"Request URL: {request.url}")
+        logger.info(f"Headers: {dict(request.headers)}")
+        
+        # Get raw body for signature verification
+        body = await request.body()
+        logger.info(f"Raw body: {body.decode('utf-8', errors='replace')}")
         
         logger.info("WhatsApp webhook POST received")
         
@@ -164,7 +192,11 @@ async def whatsapp_webhook_post(request: Request):
         logger.info(f"Messages found: {len(messages)}")
         
         if not messages:
-            logger.info("No messages in webhook")
+            logger.info("No messages in webhook - this might be a health check or other event")
+            # Log what we did get in the webhook
+            logger.info(f"Webhook contains: {list(data.keys())}")
+            if 'entry' in data:
+                logger.info(f"Entry data: {data['entry']}")
             return JSONResponse({"ok": True, "status": "no_messages"})
         
         message_obj = messages[0] or {}
@@ -189,7 +221,13 @@ async def whatsapp_webhook_post(request: Request):
         access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
         if not access_token:
             logger.error("WHATSAPP_ACCESS_TOKEN not found in environment")
+            logger.error("Available environment variables:")
+            for key in ["WHATSAPP_ACCESS_TOKEN", "WHATSAPP_VERIFY_TOKEN", "WHATSAPP_API_VERSION", "FACEBOOK_APP_SECRET"]:
+                value = os.getenv(key)
+                logger.error(f"  {key}: {'SET' if value else 'NOT SET'}")
             return JSONResponse({"ok": False, "error": "WhatsApp access token missing"}, status_code=500)
+        
+        logger.info("✅ WhatsApp credentials found, processing message...")
         
         # Process message
         session_id = from_number or None
@@ -204,6 +242,7 @@ async def whatsapp_webhook_post(request: Request):
                 {"id": "1", "title": "Kiswahili"},
                 {"id": "2", "title": "English"}
             ]
+            logger.info("📤 Sending language selection buttons...")
             result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
             logger.info(f"Buttons sent: {result}")
         elif reply == "MAIN_MENU":
@@ -218,16 +257,22 @@ async def whatsapp_webhook_post(request: Request):
                     {"id": "5", "title": "💊 Ushauri/maelekezo ya dawa (Pharmacy)", "description": "Dawa na vifaa tiba"}
                 ]
             }]
+            logger.info("📤 Sending main menu list...")
             result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
             logger.info(f"List sent: {result}")
         elif phone_number_id and from_number:
+            logger.info(f"📤 Sending text message: {reply}")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=reply)
             logger.info(f"Text sent: {result}")
         
+        logger.info("✅ Webhook processing completed successfully")
         return JSONResponse({"ok": True, "session_id": sid})
         
     except Exception as e:
         import logging
         logger = logging.getLogger(__name__)
-        logger.error(f"WhatsApp webhook error: {str(e)}")
+        logger.error(f"❌ WhatsApp webhook error: {str(e)}")
+        logger.error(f"Error type: {type(e).__name__}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
