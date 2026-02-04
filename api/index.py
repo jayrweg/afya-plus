@@ -146,19 +146,32 @@ async def whatsapp_webhook_get(request: Request):
 async def whatsapp_webhook_post(request: Request):
     """WhatsApp webhook message handling"""
     try:
+        # Log the incoming request for debugging
+        import logging
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
+        
+        logger.info("WhatsApp webhook POST received")
+        
         data = await request.json()
+        logger.info(f"Webhook data: {data}")
         
         entry = (data.get("entry") or [])[0] or {}
         changes = (entry.get("changes") or [])[0] or {}
         value = changes.get("value") or {}
         messages = value.get("messages") or []
         
+        logger.info(f"Messages found: {len(messages)}")
+        
         if not messages:
+            logger.info("No messages in webhook")
             return JSONResponse({"ok": True, "status": "no_messages"})
         
         message_obj = messages[0] or {}
         from_number = str(message_obj.get("from") or "").strip()
         phone_number_id = str((value.get("metadata") or {}).get("phone_number_id") or "").strip()
+        
+        logger.info(f"From: {from_number}, Phone ID: {phone_number_id}")
         
         # Extract message text
         text = ""
@@ -170,9 +183,19 @@ async def whatsapp_webhook_post(request: Request):
         else:
             text = str((message_obj.get("text") or {}).get("body") or "")
         
+        logger.info(f"Message text: {text}")
+        
+        # Check if WhatsApp credentials are available
+        access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
+        if not access_token:
+            logger.error("WHATSAPP_ACCESS_TOKEN not found in environment")
+            return JSONResponse({"ok": False, "error": "WhatsApp access token missing"}, status_code=500)
+        
         # Process message
         session_id = from_number or None
         sid, reply = _ENGINE.handle_message(session_id=session_id, text=text, is_whatsapp=True)
+        
+        logger.info(f"Engine response: {reply}")
         
         # Handle special WhatsApp responses
         if reply == "LANGUAGE_SELECTION":
@@ -181,7 +204,8 @@ async def whatsapp_webhook_post(request: Request):
                 {"id": "1", "title": "Kiswahili"},
                 {"id": "2", "title": "English"}
             ]
-            send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            logger.info(f"Buttons sent: {result}")
         elif reply == "MAIN_MENU":
             message = "Afyaplus inakuletea huduma zifuatazo, chagua:\n\nKumbuka: Afyabot hatoi utambuzi rasmi wa ugonjwa. Kwa dharura piga simu huduma ya dharura ya eneo lako mara moja."
             sections = [{
@@ -194,11 +218,16 @@ async def whatsapp_webhook_post(request: Request):
                     {"id": "5", "title": "💊 Ushauri/maelekezo ya dawa (Pharmacy)", "description": "Dawa na vifaa tiba"}
                 ]
             }]
-            send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            logger.info(f"List sent: {result}")
         elif phone_number_id and from_number:
-            send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=reply)
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=reply)
+            logger.info(f"Text sent: {result}")
         
         return JSONResponse({"ok": True, "session_id": sid})
         
     except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"WhatsApp webhook error: {str(e)}")
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
