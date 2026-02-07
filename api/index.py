@@ -107,6 +107,9 @@ async def whatsapp_webhook_post(request: Request):
         sid, reply = _ENGINE.handle_message(session_id=session_id, text=text, is_whatsapp=True)
         
         logger.info(f"Engine response: {reply}")
+        logger.info(f"Session ID: {session_id}")
+        logger.info(f"From number: {from_number}")
+        logger.info(f"Current session stage: {_ENGINE.sessions.get(from_number).stage if _ENGINE.sessions.get(from_number) else 'No session'}")
         
         # Handle WhatsApp responses using existing functions
         if reply == "LANGUAGE_SELECTION":
@@ -176,6 +179,7 @@ Chagua lugha"""
             logger.info(f"Name request sent: {result}")
             
         elif reply == "COLLECT_PHONE":
+            logger.info("🎯 HIT: COLLECT_PHONE block reached")
             message = "Asante! Sasa andika namba yako ya simu (inaanza na 255, 0, au +255):"
             logger.info("📤 Sending phone collection request...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
@@ -382,6 +386,7 @@ Tuma '1' kuendelea"""
             
         else:
             # Send as text message for now
+            logger.info(f"🔥 FALLING THROUGH TO DEFAULT: reply='{reply}'")
             logger.info("📤 Sending text message...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=reply)
             logger.info(f"Text message sent: {result}")
