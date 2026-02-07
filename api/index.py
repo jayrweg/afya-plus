@@ -105,9 +105,14 @@ async def whatsapp_webhook_post(request: Request):
         # Process message
         session_id = from_number or None
         response = _ENGINE.handle_message(session_id=session_id, text=text, is_whatsapp=True)
-        sid, reply = response[0], response[1]
-        
-        logger.info(f"Engine response: {reply}")
+        logger.info(f"Full engine response: {response}")
+        logger.info(f"Response type: {type(response)}")
+        if isinstance(response, tuple) and len(response) == 2:
+            sid, reply = response[0], response[1]
+        else:
+            sid, reply = response
+        logger.info(f"Extracted reply: {reply}")
+        logger.info(f"Reply type: {type(reply)}")
         
         # Handle WhatsApp responses using existing functions
         if reply == "LANGUAGE_SELECTION":
