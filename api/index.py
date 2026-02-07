@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
+from afyabot_types import Language
 
 # Simple engine import
 from engine import AfyabotEngine
@@ -109,133 +110,190 @@ async def whatsapp_webhook_post(request: Request):
         
         # Handle WhatsApp responses using existing functions
         if reply == "LANGUAGE_SELECTION":
-            message = """Afya+
+            # Check if user has chosen language before
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """Afya+
+Hello!
+Welcome to Afyaplus - Better health solutions
+We bring healthcare closer to you
+Choose language:"""
+                buttons = [
+                    {"id": "1", "title": "Swahili"},
+                    {"id": "2", "title": "English"}
+                ]
+            else:
+                message = """Afya+
 Habari!
 Karibu afyaplus chaguo bora kwa afya yako
 Tunakusogeza karibu na matibabu kupata suluhisho bora kwa afya yako
 Chagua lugha"""
-            buttons = [
-                {"id": "1", "title": "Kiswahili"},
-                {"id": "2", "title": "English"}
-            ]
+                buttons = [
+                    {"id": "1", "title": "Kiswahili"},
+                    {"id": "2", "title": "English"}
+                ]
             logger.info("📤 Sending language selection buttons...")
             result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
             logger.info(f"Buttons sent: {result}")
             
         elif reply == "MAIN_MENU":
-            message = """Afyaplus inakuletea huduma zifuatazo,chagua"""
-            sections = [{
-                "title": "Matibabu",
-                "rows": [
-                    {"id": "1", "title": "🩺 Daktari jumla (GP)"},
-                    {"id": "2", "title": "👨‍⚕️ Daktari bingwa"},
-                    {"id": "3", "title": "🏠 Daktari nyumbani"},
-                    {"id": "4", "title": "🏢 Afya ya kazi"},
-                    {"id": "5", "title": "💊 Dawa na madawa"}
-                ]
-            }]
+            # Check language and show appropriate menu
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """Afyaplus offers the following services:"""
+                sections = [{
+                    "title": "Medical Services",
+                    "rows": [
+                        {"id": "1", "title": "🩺 General Practitioner"},
+                        {"id": "2", "title": "👨‍⚕️ Specialist Doctor"},
+                        {"id": "3", "title": "🏠 Home Doctor"},
+                        {"id": "4", "title": "🏢 Workplace Health"},
+                        {"id": "5", "title": "💊 Pharmacy"}
+                    ]
+                }]
+                button_text = "Choose service"
+            else:
+                message = """Afyaplus inakuletea huduma zifuatazo,chagua"""
+                sections = [{
+                    "title": "Matibabu",
+                    "rows": [
+                        {"id": "1", "title": "🩺 Daktari jumla (GP)"},
+                        {"id": "2", "title": "👨‍⚕️ Daktari bingwa"},
+                        {"id": "3", "title": "🏠 Daktari nyumbani"},
+                        {"id": "4", "title": "🏢 Afya ya kazi"},
+                        {"id": "5", "title": "💊 Dawa na madawa"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
             logger.info("📤 Sending main menu list...")
-            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text="Chagua huduma")
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text=button_text)
             logger.info(f"List sent: {result}")
             
-        elif reply == "GP_MENU":
-            message = """Afya+ inakuunganisha na daktari kwa ushauri na matibabu papo hapo kiganjani mwako.
-
-Tibu magonjwa ya kawaida na yale ya muda mrefu bila usumbufu wa kusafiri:
-• Chunusi, Mapunye, na Eczema
-• Mzio (Allergies)
-• Wasiwasi na Msongo wa Mawazo
-• Pumu (Asthma)
-• Maumivu ya Mgongo
-• Uzazi wa Mpango
-• Mafua, Homa, na Kikohozi
-• Ugonjwa wa Kisukari
-• Kuhara
-• Kizunguzungu
-• Maambukizi ya Masikio
-• Upungufu wa Nguvu za Kiume
-• Ugonjwa wa magoti
-• Kukatika kwa Nywele
-• Shinikizo la Juu la Damu
-• Kichwa Migraine
-• Macho Mekundu
-• Matatizo ya Sinus/Pua
-• Maumivu ya Koo
-• Maambukizi ya Njia ya Mkojo - UTI
-• Kutapika
-• Kupunguza Uzito
-
-Chagua njia ya kuunganishwa:
-1. Kuunganishwa kwa kuchati kwenye simu 3k tzs
-2. Kuunganishwa kwa whatsapp video call 5ktzs"""
-            logger.info("📤 Sending GP info...")
+        elif reply == "COLLECT_NAME":
+            message = "Andika jina lako kamili:"
+            logger.info("📤 Sending name collection request...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"GP info sent: {result}")
+            logger.info(f"Name request sent: {result}")
+            
+        elif reply == "COLLECT_PHONE":
+            message = "Asante! Sasa andika namba yako ya simu (inaanza na 255, 0, au +255):"
+            logger.info("📤 Sending phone collection request...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Phone request sent: {result}")
+            
+        elif reply == "COLLECT_NAME_ERROR":
+            message = "Jina lako ni fupi sana. Tafadhali andika jina kamili."
+            logger.info("📤 Sending name error message...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Name error sent: {result}")
+            
+        elif reply == "COLLECT_PHONE_ERROR":
+            message = "Namba ya simu si sahihi. Tumia namba inaanza na 255, 0, au +255"
+            logger.info("📤 Sending phone error message...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Phone error sent: {result}")
+            
+        elif reply == "PAYMENT_SUMMARY":
+            # Create payment summary with character limits
+            session = _ENGINE.sessions.get(from_number)
+            order = session.active_order if session and hasattr(session, 'active_order') and session.active_order else None
+            if order:
+                message = f"""📋 Muhtasari wa Malipo
+Huduma: {order.service_name}
+Bei: TZS {order.amount_tzs:,}
+Jina: {order.user_name}
+Simu: {order.user_phone}
+
+Namba ya malipo: {order.token}
+
+Tuma pesa kwa namba:
+- M-Pesa: 123456789
+- Tigo Pesa: 987654321
+- Airtel Money: 456789123
+
+Baada ya malipo, tuma 'paid {order.token}'"""
+            else:
+                message = "Kuna tatizo na muhtasari wako. Tafadhali anza tena."
+            logger.info("📤 Sending payment summary...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Payment summary sent: {result}")
+            
+        elif reply == "GP_MENU":
+            message = """🩺 Huduma ya Daktari Jumla (GP)
+
+Tibu magonjwa ya kawaida:
+• Chunusi, Eczema, Mzio
+• Pumu, Presha, Sukari
+• Mafua, Homna, Kikohozi
+• Maumivu ya mgongo, kichwa
+• UTI, Kuhara, Kizunguzungu
+
+Chagua njia:
+1. Chat (simu) - TZS 3,000
+2. Video call - TZS 5,000"""
+            logger.info("📤 Sending GP menu...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"GP menu sent: {result}")
             
         elif reply == "SPECIALIST_MENU":
-            message = """Ikiwa unakabiliana na dalili endelevu, na magonjwa ya muda mrefu, au unahitaji ushauri wa kitaalamu kwa tatizo maalum la kiafya, huenda wakati umefika wa kuzungumza na daktari bingwa.
+            message = """👨‍⚕️ Huduma ya Daktari Bingwa
 
-Afya+ inakusaidia kupata Ushauri wa kidijitali ni msaada mkubwa hasa katika kupitia majibu ya vipimo, kujadili chaguzi za matibabu, au kupata maoni ya pili ya kitaalamu bila kuhitaji kusafiri au kusubiri kliniki.
+Kwa magonjwa ya muda mrefu:
+• Magonjwa ya ngozi
+• Uzazi na wanawake
+• Watoto, Moyo, Presha
+• Mifupa, Mishipa
+• Chakula, Allergy
 
-Iwe ni:
-● Magonjwa ya ngozi
-● Magonjwa ya uzazi na wanawake
-● Watoto
-● Moyo, presha na sukari, magonjwa ya ndani kwa ujumla
-● Mifupa
-● Mfumo wa mmeng'enyo wa chakula au fani nyinginezo
-
-Chagua njia ya kuunganishwa:
-1. Kuwasiliana na daktari bingwa kwa kuchati (25k)
-2. Kuwasiliana na daktari bingwa kwa video call(30k)"""
-            logger.info("📤 Sending Specialist info...")
+Chagua njia:
+1. Chat - TZS 25,000
+2. Video - TZS 30,000"""
+            logger.info("📤 Sending Specialist menu...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Specialist info sent: {result}")
+            logger.info(f"Specialist menu sent: {result}")
             
         elif reply == "HOME_DOCTOR_MENU":
-            message = """Afya+ inakuletea Daktari wa nyumbani kuleta huduma bora za afya moja kwa moja hadi mlangoni pako. Kama vile kupata klinika ya daktari wa kawaida (GP), madaktari wetu wenye leseni wanatoa ushauri wa kitaalamu — lakini kwa ana kwa ana, katika starehe na faragha ya nyumba yako. Epuka foleni za kliniki — sisi tunakuja kwako.
+            message = """🏠 Daktari Nyumbani
 
-Chagua huduma:
-1. Matibabu ya haraka - Pata huduma za matibabu ya ana kwa ana kwa magonjwa ya kawaida kama mafua, maambukizi madogo, na dalili nyinginezo ambazo si za dharura — zote kwa pamoja. (30k)
-2. Taratibu Tiba/medical procedure - Pata huduma salama za kitabibu zinazotolewa na wataalamu katika utulivu wa nyumbani kwako — ikijumuisha usimamizi wa dawa, huduma za dripu (IV), kusafisha vidonda vya upasuaji, huduma ya kwanza, na uchukuaji wa sampuli za vipimo. (30k)
-3. Mwongozo wa matibabu(advanced medical directives) - AMD ni waraka wa kisheria unaokuwezesha kuandika mapema maamuzi yako ya matibabu endapo utashindwa kuwasiliana siku zijazo. Madaktari wetu hutoa ushauri wa kitabibu nyumbani kukueleza AMD, kukusaidia kufanya maamuzi sahihi, na kuthibitisha maombi yako ya AMD. (50k)
-4. Tathmini ya Ulemavu (SDA) - Madaktari wetu hufanya tathmini ya kitaalamu nyumbani kwako ili kuangalia uwezo wa kumudu shughuli za kila siku, kama vile kuoga, kuvaa, kula, na uwezo wa kutembea. (30k)
+Tunakuja kwako nyumbani:
+1. Matibabu ya haraka - TZS 30,000
+2. Matibabu procedure - TZS 30,000  
+3. Mwongozo AMD - TZS 50,000
+4. Tathmini SDA - TZS 30,000
 
-Chagua namba ya huduma (1-4)"""
-            logger.info("📤 Sending Home Doctor info...")
+Chagua huduma (1-4)"""
+            logger.info("📤 Sending Home Doctor menu...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Home Doctor info sent: {result}")
+            logger.info(f"Home Doctor menu sent: {result}")
             
         elif reply == "WORKPLACE_MENU":
-            message = """Huduma za afya kwa mashirika kutoka Afyaplus zimeundwa kwa ajili ya biashara za ukubwa wowote, uwe ni kampuni kubwa, biashara ndogo na za kati (SME), au kampuni changa yenye wafanyakazi nchini Tanzania.
+            message = """🏢 Afya ya Kazi
 
-Chagua huduma:
-1. Kwa Vipimo vya afya kabla ya kuanza ajira - Uchunguzi wa afya mapema huwezesha usaidizi wa kitabibu kwa wakati, jambo ambalo hupunguza hatari ya matatizo ya muda mrefu na kuimarisha hali ya afya kwa kabla ya kuanza kazi. (10k)
-2. Uchunguzi wa afya (Screening) na chanjo - Huduma za chanjo husaidia kupunguza kuenea kwa magonjwa mahali pa kazi, kupunguza utoro kazini, na kuwalinda wafanyakazi walio katika hatari zaidi. (10k)
-3. Mada na semina za afya(workplace wellness solutions) - Jenga timu yenye afya, furaha, na tija zaidi kupitia mihadhara, warsha, na wavuti za ustawi zinazoendeshwa na wataalamu na kulingana na mahitaji ya taasisi yako.
+Kwa wafanyakazi:
+1. Vipimo kabla ya kazi - TZS 10,000
+2. Chanjo na uchunguzi - TZS 10,000
+3. Mada za afya - TZS 10,000
 
-Mada zetu kuu ni pamoja na:
-• Afya ya akili na udhibiti wa msongo wa mawazo
-• Umakinifu (Mindfulness) kwa ajili ya kuongeza umakini na tija
-• Usingizi bora na kuongeza nguvu ya mwili
-• Fikra chanya na ustahimilivu
-• Hamasisho na ufikiaji wa malengo
-
-Chagua namba ya huduma (1-3)"""
-            logger.info("📤 Sending Workplace info...")
+Chagua huduma (1-3)"""
+            logger.info("📤 Sending Workplace menu...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Workplace info sent: {result}")
+            logger.info(f"Workplace menu sent: {result}")
             
         elif reply == "PHARMACY_MENU":
-            message = """Nunua bidhaa za afya na ustawi kwa ushauri wa kitaalamu kutoka kwa madaktari, pamoja na maelekezo sahihi ya matumizi ya dawa (prescriptions) kulingana na mahitaji yako.
+            message = """💊 Duka la Dawa
 
-Tunahakikisha huduma salama, rahisi, na ya kuaminika, ili kukusaidia kulinda na kuboresha afya yako kwa uhakika.
+Pata dawa na vifaa:
+• Dawa za daktari
+• Vifaa vya matibabu  
+• Vitamins na supplements
+• Ushauri wa dawa
 
-Bonyeza link ifuatayo kupata huduma hii:
-Shop health and wellness 4k"""
-            logger.info("📤 Sending Pharmacy info...")
+Bei: TZS 4,000
+
+Tuma '1' kuendelea"""
+            logger.info("📤 Sending Pharmacy menu...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Pharmacy info sent: {result}")
+            logger.info(f"Pharmacy menu sent: {result}")
             
         else:
             # Send as text message for now
