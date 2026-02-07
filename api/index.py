@@ -127,11 +127,11 @@ Chagua lugha"""
             sections = [{
                 "title": "Matibabu",
                 "rows": [
-                    {"id": "1", "title": "🩺 Kuwasiliana na daktari jumla(GP)"},
-                    {"id": "2", "title": "👨‍⚕️ Kuwasiliana na daktari bingwa(specialist)"},
-                    {"id": "3", "title": "🏠 Huduma ya daktari nyumbani(homedoctor)"},
-                    {"id": "4", "title": "🏢 Afya mazingira ya kazi(corporate)"},
-                    {"id": "5", "title": "💊 Ushauri ,maelekezo ya dawa(pharmacy)"}
+                    {"id": "1", "title": "🩺 Daktari jumla (GP)"},
+                    {"id": "2", "title": "👨‍⚕️ Daktari bingwa"},
+                    {"id": "3", "title": "🏠 Daktari nyumbani"},
+                    {"id": "4", "title": "🏢 Afya ya kazi"},
+                    {"id": "5", "title": "💊 Dawa na madawa"}
                 ]
             }]
             logger.info("📤 Sending main menu list...")

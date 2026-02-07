@@ -53,8 +53,8 @@ class AfyabotEngine:
             # Invalid choice - show language selection again
             return session.session_id, "LANGUAGE_SELECTION"
 
-        # Reset session if user sends greeting at main menu (to restart flow)
-        if session.stage == Stage.MAIN_MENU and msg in {"hi", "hello", "habari"}:
+        # Reset session if user sends greeting and already has language (to restart flow)
+        if session.language is not None and msg in {"hi", "hello", "habari"}:
             session = self.reset(session)
             self._sessions[session.session_id] = session
             return session.session_id, "LANGUAGE_SELECTION"
