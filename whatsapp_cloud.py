@@ -102,7 +102,13 @@ def send_whatsapp_buttons(*, phone_number_id: str, to: str, message: str, button
         return None
 
 
-def send_whatsapp_list(*, phone_number_id: str, to: str, message: str, sections: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+def send_whatsapp_list(
+    phone_number_id: str, 
+    to: str, 
+    message: str, 
+    sections: list[dict[str, any]], 
+    button_text: str = "Options"
+) -> dict[str, any]:
     """Send interactive list message"""
     access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
     api_version = os.getenv("WHATSAPP_API_VERSION", "v19.0")
@@ -136,7 +142,7 @@ def send_whatsapp_list(*, phone_number_id: str, to: str, message: str, sections:
             "type": "list",
             "body": {"text": message},
             "action": {
-                "button": sections[0].get("title", "Options") if sections else "Options",
+                "button": button_text,
                 "sections": section_objects
             }
         }

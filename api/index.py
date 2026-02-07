@@ -135,7 +135,7 @@ Chagua lugha"""
                 ]
             }]
             logger.info("📤 Sending main menu list...")
-            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text="Chagua huduma")
             logger.info(f"List sent: {result}")
             
         elif reply == "GP_MENU":
