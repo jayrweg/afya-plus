@@ -260,6 +260,59 @@ async def whatsapp_webhook_post(request: Request):
             logger.info("📤 Sending main menu list...")
             result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
             logger.info(f"List sent: {result}")
+        elif reply == "GP_OPTIONS":
+            message = "Afya+ inakuunganisha na daktari kwa ushauri na matibabu papo hapo.\n\nHusaidia magonjwa ya kawaida na sugu kama: chunusi/eczema, mzio, wasiwasi, pumu, maumivu ya mgongo, uzazi wa mpango, mafua/homa/kikohozi, kisukari, UTI n.k.\n\nChagua njia ya huduma:"
+            buttons = [
+                {"id": "1", "title": "💬 Kuchati kwenye simu (TZS 100)"},
+                {"id": "2", "title": "📹 WhatsApp video call (TZS 200)"}
+            ]
+            logger.info("📤 Sending GP options buttons...")
+            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            logger.info(f"Buttons sent: {result}")
+        elif reply == "SPECIALIST_OPTIONS":
+            message = "Afya+ inakuletea daktari bingwa kwa ushauri wa kitaalamu (ngozi, uzazi/wanawake, watoto, moyo/presha/sukari, mifupa, mmeng'enyo n.k.).\n\nChagua njia:"
+            buttons = [
+                {"id": "1", "title": "💬 Kuchati (TZS 300)"},
+                {"id": "2", "title": "📹 Video call (TZS 300)"}
+            ]
+            logger.info("📤 Sending specialist options buttons...")
+            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            logger.info(f"Buttons sent: {result}")
+        elif reply == "HOME_DOCTOR_MENU":
+            message = "Huduma ya daktari nyumbani. Chagua:"
+            sections = [{
+                "title": "Home Doctor Services",
+                "rows": [
+                    {"id": "1", "title": "🩺 Quick treatment", "description": "TZS 100"},
+                    {"id": "2", "title": "🩺 Medical procedure", "description": "TZS 300"},
+                    {"id": "3", "title": "🧪 AMD test", "description": "TZS 300"},
+                    {"id": "4", "title": "♿ Tathmini ya ulemavu (SDA)", "description": "TZS 300"}
+                ]
+            }]
+            logger.info("📤 Sending home doctor menu list...")
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            logger.info(f"List sent: {result}")
+        elif reply == "WORKPLACE_MENU":
+            message = "Afya mazingira ya kazi. Chagua:"
+            sections = [{
+                "title": "Corporate Services",
+                "rows": [
+                    {"id": "1", "title": "🏥 Pre-employment medical check", "description": "TZS 200"},
+                    {"id": "2", "title": "🔬 Health screening & vaccination", "description": "TZS 200"},
+                    {"id": "3", "title": "💼 Workplace wellness solutions", "description": "TZS 200"}
+                ]
+            }]
+            logger.info("📤 Sending workplace menu list...")
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            logger.info(f"List sent: {result}")
+        elif reply == "PHARMACY_MENU":
+            message = "Pharmacy: Shop health and wellness (TZS 100)."
+            buttons = [
+                {"id": "1", "title": "🛒 Continue to shop"}
+            ]
+            logger.info("📤 Sending pharmacy menu buttons...")
+            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            logger.info(f"Buttons sent: {result}")
         elif phone_number_id and from_number:
             logger.info(f"📤 Sending text message: {reply}")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=reply)
