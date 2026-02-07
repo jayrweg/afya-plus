@@ -136,7 +136,7 @@ def send_whatsapp_list(*, phone_number_id: str, to: str, message: str, sections:
             "type": "list",
             "body": {"text": message},
             "action": {
-                "button": section[0].get("title", "Options") if sections else "Options",
+                "button": sections[0].get("title", "Options") if sections else "Options",
                 "sections": section_objects
             }
         }
