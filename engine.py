@@ -70,7 +70,11 @@ class AfyabotEngine:
         if session.language is None or session.stage == Stage.LANGUAGE:
             reply, new_lang = self._handle_language_choice(msg)
             if new_lang is None:
+                # This is the initial greeting, show language selection
+                if is_whatsapp:
+                    return session.session_id, "LANGUAGE_SELECTION"
                 return session.session_id, reply
+            # Language was chosen, proceed to main menu
             session.language = new_lang
             session.stage = Stage.MAIN_MENU
             return session.session_id, self._render_main_menu(session, is_whatsapp)
