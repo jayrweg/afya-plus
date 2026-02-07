@@ -148,13 +148,13 @@ class AfyabotEngine:
         if msg in {"1", "1)", "gp", "general", "daktari", "daktari jumla"}:
             session.stage = Stage.GP
             if is_whatsapp:
-                return "GP_OPTIONS"
+                return "GP_MENU"
             return "\n\n".join([t(session.language, "gp_info"), t(session.language, "gp_channel")])
 
         if msg in {"2", "2)", "specialist", "bingwa", "daktari bingwa"}:
             session.stage = Stage.SPECIALIST
             if is_whatsapp:
-                return "SPECIALIST_OPTIONS"
+                return "SPECIALIST_MENU"
             return "\n\n".join([t(session.language, "specialist_info"), t(session.language, "specialist_channel")])
 
         if msg in {"3", "3)", "home", "home doctor", "daktari nyumbani", "nyumbani"}:
@@ -178,16 +178,16 @@ class AfyabotEngine:
         return t(session.language, "fallback")
 
     def _handle_gp(self, session: Session, msg: str, is_whatsapp: bool = False) -> str:
-        if msg in {"1", "1)", "chat", "kuchati"}:
+        if msg in {"1", "1)", "chat", "kuchati", "gp_chat"}:
             return self._create_checkout(session, service_code="gp_chat", service_name="GP Chat", amount_tzs=100, channel="chat")
-        if msg in {"2", "2)", "video", "call", "video call", "whatsapp"}:
+        if msg in {"2", "2)", "video", "call", "video call", "whatsapp", "gp_video"}:
             return self._create_checkout(session, service_code="gp_video", service_name="GP Video", amount_tzs=200, channel="video")
         return t(session.language, "gp_channel")
 
     def _handle_specialist(self, session: Session, msg: str, is_whatsapp: bool = False) -> str:
-        if msg in {"1", "1)", "chat", "kuchati"}:
+        if msg in {"1", "1)", "chat", "kuchati", "specialist_chat"}:
             return self._create_checkout(session, service_code="spec_chat", service_name="Specialist Chat", amount_tzs=300, channel="chat")
-        if msg in {"2", "2)", "video", "call", "video call"}:
+        if msg in {"2", "2)", "video", "call", "video call", "specialist_video"}:
             return self._create_checkout(session, service_code="spec_video", service_name="Specialist Video", amount_tzs=300, channel="video")
         return t(session.language, "specialist_channel")
 

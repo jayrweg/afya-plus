@@ -260,24 +260,30 @@ async def whatsapp_webhook_post(request: Request):
             logger.info("📤 Sending main menu list...")
             result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
             logger.info(f"List sent: {result}")
-        elif reply == "GP_OPTIONS":
-            message = "Afya+ inakuunganisha na daktari kwa ushauri na matibabu papo hapo.\n\nHusaidia magonjwa ya kawaida na sugu kama: chunusi/eczema, mzio, wasiwasi, pumu, maumivu ya mgongo, uzazi wa mpango, mafua/homa/kikohozi, kisukari, UTI n.k.\n\nChagua njia ya huduma:"
-            buttons = [
-                {"id": "1", "title": "💬 Kuchati kwenye simu (TZS 100)"},
-                {"id": "2", "title": "📹 WhatsApp video call (TZS 200)"}
-            ]
-            logger.info("📤 Sending GP options buttons...")
-            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
-            logger.info(f"Buttons sent: {result}")
-        elif reply == "SPECIALIST_OPTIONS":
-            message = "Afya+ inakuletea daktari bingwa kwa ushauri wa kitaalamu (ngozi, uzazi/wanawake, watoto, moyo/presha/sukari, mifupa, mmeng'enyo n.k.).\n\nChagua njia:"
-            buttons = [
-                {"id": "1", "title": "💬 Kuchati (TZS 300)"},
-                {"id": "2", "title": "📹 Video call (TZS 300)"}
-            ]
-            logger.info("📤 Sending specialist options buttons...")
-            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
-            logger.info(f"Buttons sent: {result}")
+        elif reply == "GP_MENU":
+            message = "Afya+ inakuunganisha na daktari jumla kwa ushauri na matibabu papo hapo.\n\nHusaidia magonjwa ya kawaida na sugu kama: chunusi/eczema, mzio, wasiwasi, pumu, maumivu ya mgongo, uzazi wa mpango, mafua/homa/kikohozi, kisukari, UTI n.k."
+            sections = [{
+                "title": "🩺 GP Services",
+                "rows": [
+                    {"id": "gp_chat", "title": "💬 Chat kwenye simu", "description": "TZS 100 - Ushauri wa moja kwa moja"},
+                    {"id": "gp_video", "title": "📹 WhatsApp video call", "description": "TZS 200 - Tiba ya video"}
+                ]
+            }]
+            logger.info("📤 Sending GP menu list...")
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            logger.info(f"List sent: {result}")
+        elif reply == "SPECIALIST_MENU":
+            message = "Afya+ inakuletea daktari bingwa kwa ushauri wa kitaalamu (ngozi, uzazi/wanawake, watoto, moyo/presha/sukari, mifupa, mmeng'enyo n.k.)."
+            sections = [{
+                "title": "👨‍⚕️ Specialist Services",
+                "rows": [
+                    {"id": "specialist_chat", "title": "💬 Chat", "description": "TZS 300 - Ushauri wa kitaalamu"},
+                    {"id": "specialist_video", "title": "📹 Video call", "description": "TZS 300 - Tiba ya video"}
+                ]
+            }]
+            logger.info("📤 Sending specialist menu list...")
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            logger.info(f"List sent: {result}")
         elif reply == "HOME_DOCTOR_MENU":
             message = "Huduma ya daktari nyumbani. Chagua:"
             sections = [{
