@@ -8,6 +8,11 @@ from fastapi.responses import JSONResponse
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import existing WhatsApp functions
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
+
 # Simple engine import
 from engine import AfyabotEngine
 
@@ -102,114 +107,39 @@ async def whatsapp_webhook_post(request: Request):
         
         logger.info(f"Engine response: {reply}")
         
-        # Handle WhatsApp responses
+        # Handle WhatsApp responses using existing functions
         if reply == "LANGUAGE_SELECTION":
-            await send_language_selection(phone_number_id, from_number)
-        elif reply == "MAIN_MENU":
-            await send_main_menu(phone_number_id, from_number)
-        elif reply == "GP_MENU":
-            await send_gp_menu(phone_number_id, from_number)
-        elif reply == "SPECIALIST_MENU":
-            await send_specialist_menu(phone_number_id, from_number)
-        elif reply == "HOME_DOCTOR_MENU":
-            await send_home_doctor_menu(phone_number_id, from_number)
-        elif reply == "WORKPLACE_MENU":
-            await send_workplace_menu(phone_number_id, from_number)
-        elif reply == "PHARMACY_MENU":
-            await send_pharmacy_menu(phone_number_id, from_number)
-        else:
-            # Send as text message for now
-            await send_text_message(phone_number_id, from_number, reply)
-        
-        logger.info("✅ Webhook processing completed successfully")
-        return JSONResponse({"ok": True, "status": "success"})
-        
-    except Exception as e:
-        logger.error(f"❌ Error processing webhook: {str(e)}")
-        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
-
-async def send_language_selection(phone_number_id: str, to: str):
-    """Send language selection buttons"""
-    import httpx
-    
-    message = """Afya+
+            message = """Afya+
 Habari!
 Karibu afyaplus chaguo bora kwa afya yako
 Tunakusogeza karibu na matibabu kupata suluhisho bora kwa afya yako
 Chagua lugha"""
-    
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "type": "interactive",
-        "interactive": {
-            "type": "button",
-            "body": {"text": message},
-            "action": {
-                "buttons": [
-                    {"type": "reply", "reply": {"id": "1", "title": "Kiswahili"}},
-                    {"type": "reply", "reply": {"id": "2", "title": "English"}}
+            buttons = [
+                {"id": "1", "title": "Kiswahili"},
+                {"id": "2", "title": "English"}
+            ]
+            logger.info("📤 Sending language selection buttons...")
+            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            logger.info(f"Buttons sent: {result}")
+            
+        elif reply == "MAIN_MENU":
+            message = """Afyaplus inakuletea huduma zifuatazo,chagua"""
+            sections = [{
+                "title": "Matibabu",
+                "rows": [
+                    {"id": "1", "title": "🩺 Kuwasiliana na daktari jumla(GP)"},
+                    {"id": "2", "title": "👨‍⚕️ Kuwasiliana na daktari bingwa(specialist)"},
+                    {"id": "3", "title": "🏠 Huduma ya daktari nyumbani(homedoctor)"},
+                    {"id": "4", "title": "🏢 Afya mazingira ya kazi(corporate)"},
+                    {"id": "5", "title": "💊 Ushauri ,maelekezo ya dawa(pharmacy)"}
                 ]
-            }
-        }
-    }
-    
-    url = f"https://graph.facebook.com/v24.0/{phone_number_id}/messages"
-    headers = {
-        "Authorization": f"Bearer {WHATSAPP_ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, json=payload, headers=headers)
-        logger.info(f"📤 Language selection sent: {response.status_code}")
-        logger.info(f"Response: {response.text}")
-
-async def send_main_menu(phone_number_id: str, to: str):
-    """Send main menu list"""
-    import httpx
-    
-    message = """Afyaplus inakuletea huduma zifuatazo,chagua"""
-    
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "type": "interactive",
-        "interactive": {
-            "type": "list",
-            "body": {"text": message},
-            "action": {
-                "button": "Chagua huduma",
-                "sections": [
-                    {
-                        "title": "Matibabu",
-                        "rows": [
-                            {"id": "1", "title": "🩺 Kuwasiliana na daktari jumla(GP)"},
-                            {"id": "2", "title": "👨‍⚕️ Kuwasiliana na daktari bingwa(specialist)"},
-                            {"id": "3", "title": "🏠 Huduma ya daktari nyumbani(homedoctor)"},
-                            {"id": "4", "title": "🏢 Afya mazingira ya kazi(corporate)"},
-                            {"id": "5", "title": "💊 Ushauri ,maelekezo ya dawa(pharmacy)"}
-                        ]
-                    }
-                ]
-            }
-        }
-    }
-    
-    url = f"https://graph.facebook.com/v24.0/{phone_number_id}/messages"
-    headers = {
-        "Authorization": f"Bearer {WHATSAPP_ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, json=payload, headers=headers)
-        logger.info(f"📤 Main menu sent: {response.status_code}")
-        logger.info(f"Response: {response.text}")
-
-async def send_gp_menu(phone_number_id: str, to: str):
-    """Send GP service info"""
-    message = """Afya+ inakuunganisha na daktari kwa ushauri na matibabu papo hapo kiganjani mwako.
+            }]
+            logger.info("📤 Sending main menu list...")
+            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+            logger.info(f"List sent: {result}")
+            
+        elif reply == "GP_MENU":
+            message = """Afya+ inakuunganisha na daktari kwa ushauri na matibabu papo hapo kiganjani mwako.
 
 Tibu magonjwa ya kawaida na yale ya muda mrefu bila usumbufu wa kusafiri:
 • Chunusi, Mapunye, na Eczema
@@ -238,12 +168,12 @@ Tibu magonjwa ya kawaida na yale ya muda mrefu bila usumbufu wa kusafiri:
 Chagua njia ya kuunganishwa:
 1. Kuunganishwa kwa kuchati kwenye simu 3k tzs
 2. Kuunganishwa kwa whatsapp video call 5ktzs"""
-    
-    await send_text_message(phone_number_id, to, message)
-
-async def send_specialist_menu(phone_number_id: str, to: str):
-    """Send Specialist service info"""
-    message = """Ikiwa unakabiliana na dalili endelevu, na magonjwa ya muda mrefu, au unahitaji ushauri wa kitaalamu kwa tatizo maalum la kiafya, huenda wakati umefika wa kuzungumza na daktari bingwa.
+            logger.info("📤 Sending GP info...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"GP info sent: {result}")
+            
+        elif reply == "SPECIALIST_MENU":
+            message = """Ikiwa unakabiliana na dalili endelevu, na magonjwa ya muda mrefu, au unahitaji ushauri wa kitaalamu kwa tatizo maalum la kiafya, huenda wakati umefika wa kuzungumza na daktari bingwa.
 
 Afya+ inakusaidia kupata Ushauri wa kidijitali ni msaada mkubwa hasa katika kupitia majibu ya vipimo, kujadili chaguzi za matibabu, au kupata maoni ya pili ya kitaalamu bila kuhitaji kusafiri au kusubiri kliniki.
 
@@ -258,12 +188,12 @@ Iwe ni:
 Chagua njia ya kuunganishwa:
 1. Kuwasiliana na daktari bingwa kwa kuchati (25k)
 2. Kuwasiliana na daktari bingwa kwa video call(30k)"""
-    
-    await send_text_message(phone_number_id, to, message)
-
-async def send_home_doctor_menu(phone_number_id: str, to: str):
-    """Send Home Doctor service info"""
-    message = """Afya+ inakuletea Daktari wa nyumbani kuleta huduma bora za afya moja kwa moja hadi mlangoni pako. Kama vile kupata klinika ya daktari wa kawaida (GP), madaktari wetu wenye leseni wanatoa ushauri wa kitaalamu — lakini kwa ana kwa ana, katika starehe na faragha ya nyumba yako. Epuka foleni za kliniki — sisi tunakuja kwako.
+            logger.info("📤 Sending Specialist info...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Specialist info sent: {result}")
+            
+        elif reply == "HOME_DOCTOR_MENU":
+            message = """Afya+ inakuletea Daktari wa nyumbani kuleta huduma bora za afya moja kwa moja hadi mlangoni pako. Kama vile kupata klinika ya daktari wa kawaida (GP), madaktari wetu wenye leseni wanatoa ushauri wa kitaalamu — lakini kwa ana kwa ana, katika starehe na faragha ya nyumba yako. Epuka foleni za kliniki — sisi tunakuja kwako.
 
 Chagua huduma:
 1. Matibabu ya haraka - Pata huduma za matibabu ya ana kwa ana kwa magonjwa ya kawaida kama mafua, maambukizi madogo, na dalili nyinginezo ambazo si za dharura — zote kwa pamoja. (30k)
@@ -272,12 +202,12 @@ Chagua huduma:
 4. Tathmini ya Ulemavu (SDA) - Madaktari wetu hufanya tathmini ya kitaalamu nyumbani kwako ili kuangalia uwezo wa kumudu shughuli za kila siku, kama vile kuoga, kuvaa, kula, na uwezo wa kutembea. (30k)
 
 Chagua namba ya huduma (1-4)"""
-    
-    await send_text_message(phone_number_id, to, message)
-
-async def send_workplace_menu(phone_number_id: str, to: str):
-    """Send Workplace service info"""
-    message = """Huduma za afya kwa mashirika kutoka Afyaplus zimeundwa kwa ajili ya biashara za ukubwa wowote, uwe ni kampuni kubwa, biashara ndogo na za kati (SME), au kampuni changa yenye wafanyakazi nchini Tanzania.
+            logger.info("📤 Sending Home Doctor info...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Home Doctor info sent: {result}")
+            
+        elif reply == "WORKPLACE_MENU":
+            message = """Huduma za afya kwa mashirika kutoka Afyaplus zimeundwa kwa ajili ya biashara za ukubwa wowote, uwe ni kampuni kubwa, biashara ndogo na za kati (SME), au kampuni changa yenye wafanyakazi nchini Tanzania.
 
 Chagua huduma:
 1. Kwa Vipimo vya afya kabla ya kuanza ajira - Uchunguzi wa afya mapema huwezesha usaidizi wa kitabibu kwa wakati, jambo ambalo hupunguza hatari ya matatizo ya muda mrefu na kuimarisha hali ya afya kwa kabla ya kuanza kazi. (10k)
@@ -292,38 +222,30 @@ Mada zetu kuu ni pamoja na:
 • Hamasisho na ufikiaji wa malengo
 
 Chagua namba ya huduma (1-3)"""
-    
-    await send_text_message(phone_number_id, to, message)
-
-async def send_pharmacy_menu(phone_number_id: str, to: str):
-    """Send Pharmacy service info"""
-    message = """Nunua bidhaa za afya na ustawi kwa ushauri wa kitaalamu kutoka kwa madaktari, pamoja na maelekezo sahihi ya matumizi ya dawa (prescriptions) kulingana na mahitaji yako.
+            logger.info("📤 Sending Workplace info...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Workplace info sent: {result}")
+            
+        elif reply == "PHARMACY_MENU":
+            message = """Nunua bidhaa za afya na ustawi kwa ushauri wa kitaalamu kutoka kwa madaktari, pamoja na maelekezo sahihi ya matumizi ya dawa (prescriptions) kulingana na mahitaji yako.
 
 Tunahakikisha huduma salama, rahisi, na ya kuaminika, ili kukusaidia kulinda na kuboresha afya yako kwa uhakika.
 
 Bonyeza link ifuatayo kupata huduma hii:
 Shop health and wellness 4k"""
-    
-    await send_text_message(phone_number_id, to, message)
-
-async def send_text_message(phone_number_id: str, to: str, message: str):
-    """Send a simple text message"""
-    import httpx
-    
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "type": "text",
-        "text": {"body": message}
-    }
-    
-    url = f"https://graph.facebook.com/v24.0/{phone_number_id}/messages"
-    headers = {
-        "Authorization": f"Bearer {WHATSAPP_ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, json=payload, headers=headers)
-        logger.info(f"📤 Text message sent: {response.status_code}")
-        logger.info(f"Response: {response.text}")
+            logger.info("📤 Sending Pharmacy info...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Pharmacy info sent: {result}")
+            
+        else:
+            # Send as text message for now
+            logger.info("📤 Sending text message...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=reply)
+            logger.info(f"Text message sent: {result}")
+        
+        logger.info("✅ Webhook processing completed successfully")
+        return JSONResponse({"ok": True, "status": "success"})
+        
+    except Exception as e:
+        logger.error(f"❌ Error processing webhook: {str(e)}")
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
