@@ -127,7 +127,7 @@ class AfyabotEngine:
         ])
 
     def _handle_language_choice(self, msg: str) -> Tuple[str, Language | None]:
-        if msg in {"", "hi", "hello", "habari", "start", "anza", "menu"}:
+        if msg in {"", "hello", "habari", "start", "anza", "menu"}:
             return "\n".join([
                 "Afyabot (Afya+)",
                 t(Language.SW, "greeting"),
