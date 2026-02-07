@@ -149,7 +149,7 @@ class AfyabotEngine:
         ]), None
 
     def _handle_main_menu(self, session: Session, msg: str, is_whatsapp: bool = False) -> str:
-        if msg in {"hi", "Hi", "hello", "habari", "menu", "start", "anza"}:
+        if msg in {"hi", "hello", "habari", "menu", "start", "anza"}:
             if is_whatsapp:
                 return "MAIN_MENU"
             return "\n\n".join([t(session.language, "main_menu"), t(session.language, "disclaimer")])
