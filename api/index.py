@@ -219,7 +219,26 @@ Baada ya malipo, tuma 'paid {order.token}'"""
             logger.info(f"Payment summary sent: {result}")
             
         elif reply == "GP_MENU":
-            message = """🩺 Huduma ya Daktari Jumla (GP)
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """🩺 General Practitioner Services
+
+Treat common illnesses:
+• Acne, Eczema, Allergies
+• Asthma, Pressure, Diabetes  
+• Flu, Fever, Cough
+• Back pain, Headaches
+• UTI, Diarrhea, Dizziness
+
+Choose connection method:"""
+                buttons = [
+                    {"id": "1", "title": "Chat - TZS 3,000"},
+                    {"id": "2", "title": "Video - TZS 5,000"}
+                ]
+                logger.info("📤 Sending GP menu buttons (EN)...")
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            else:
+                message = """🩺 Huduma ya Daktari Jumla (GP)
 
 Tibu magonjwa ya kawaida:
 • Chunusi, Eczema, Mzio
@@ -228,15 +247,36 @@ Tibu magonjwa ya kawaida:
 • Maumivu ya mgongo, kichwa
 • UTI, Kuhara, Kizunguzungu
 
-Chagua njia:
-1. Chat (simu) - TZS 3,000
-2. Video call - TZS 5,000"""
-            logger.info("📤 Sending GP menu...")
-            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+Chagua njia:"""
+                buttons = [
+                    {"id": "1", "title": "Chat - TZS 3,000"},
+                    {"id": "2", "title": "Video - TZS 5,000"}
+                ]
+                logger.info("📤 Sending GP menu buttons (SW)...")
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
             logger.info(f"GP menu sent: {result}")
             
         elif reply == "SPECIALIST_MENU":
-            message = """👨‍⚕️ Huduma ya Daktari Bingwa
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """👨‍⚕️ Specialist Doctor Services
+
+For long-term conditions:
+• Skin diseases
+• Women's health & fertility
+• Children, Heart, Pressure
+• Bones, Blood vessels
+• Digestion, Allergies
+
+Choose connection method:"""
+                buttons = [
+                    {"id": "1", "title": "Chat - TZS 25,000"},
+                    {"id": "2", "title": "Video - TZS 30,000"}
+                ]
+                logger.info("📤 Sending Specialist menu buttons (EN)...")
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            else:
+                message = """👨‍⚕️ Huduma ya Daktari Bingwa
 
 Kwa magonjwa ya muda mrefu:
 • Magonjwa ya ngozi
@@ -245,15 +285,31 @@ Kwa magonjwa ya muda mrefu:
 • Mifupa, Mishipa
 • Chakula, Allergy
 
-Chagua njia:
-1. Chat - TZS 25,000
-2. Video - TZS 30,000"""
-            logger.info("📤 Sending Specialist menu...")
-            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+Chagua njia:"""
+                buttons = [
+                    {"id": "1", "title": "Chat - TZS 25,000"},
+                    {"id": "2", "title": "Video - TZS 30,000"}
+                ]
+                logger.info("📤 Sending Specialist menu buttons (SW)...")
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
             logger.info(f"Specialist menu sent: {result}")
             
         elif reply == "HOME_DOCTOR_MENU":
-            message = """🏠 Daktari Nyumbani
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """🏠 Home Doctor Services
+
+We come to your home:
+1. Quick treatment - TZS 30,000
+2. Medical procedure - TZS 30,000  
+3. AMD guidance - TZS 50,000
+4. SDA assessment - TZS 30,000
+
+Choose service (1-4)"""
+                logger.info("📤 Sending Home Doctor menu (EN)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            else:
+                message = """🏠 Daktari Nyumbani
 
 Tunakuja kwako nyumbani:
 1. Matibabu ya haraka - TZS 30,000
@@ -262,12 +318,25 @@ Tunakuja kwako nyumbani:
 4. Tathmini SDA - TZS 30,000
 
 Chagua huduma (1-4)"""
-            logger.info("📤 Sending Home Doctor menu...")
-            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+                logger.info("📤 Sending Home Doctor menu (SW)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             logger.info(f"Home Doctor menu sent: {result}")
             
         elif reply == "WORKPLACE_MENU":
-            message = """🏢 Afya ya Kazi
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """🏢 Workplace Health Services
+
+For employees:
+1. Pre-employment tests - TZS 10,000
+2. Vaccination & screening - TZS 10,000
+3. Health wellness talks - TZS 10,000
+
+Choose service (1-3)"""
+                logger.info("📤 Sending Workplace menu (EN)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            else:
+                message = """🏢 Afya ya Kazi
 
 Kwa wafanyakazi:
 1. Vipimo kabla ya kazi - TZS 10,000
@@ -275,12 +344,28 @@ Kwa wafanyakazi:
 3. Mada za afya - TZS 10,000
 
 Chagua huduma (1-3)"""
-            logger.info("📤 Sending Workplace menu...")
-            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+                logger.info("📤 Sending Workplace menu (SW)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             logger.info(f"Workplace menu sent: {result}")
             
         elif reply == "PHARMACY_MENU":
-            message = """💊 Duka la Dawa
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """💊 Pharmacy Services
+
+Get medicines & supplies:
+• Doctor prescriptions
+• Medical equipment  
+• Vitamins & supplements
+• Medicine advice
+
+Price: TZS 4,000
+
+Send '1' to continue"""
+                logger.info("📤 Sending Pharmacy menu (EN)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            else:
+                message = """💊 Duka la Dawa
 
 Pata dawa na vifaa:
 • Dawa za daktari
@@ -291,8 +376,8 @@ Pata dawa na vifaa:
 Bei: TZS 4,000
 
 Tuma '1' kuendelea"""
-            logger.info("📤 Sending Pharmacy menu...")
-            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+                logger.info("📤 Sending Pharmacy menu (SW)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             logger.info(f"Pharmacy menu sent: {result}")
             
         else:
