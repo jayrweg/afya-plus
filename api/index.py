@@ -202,7 +202,23 @@ Chagua lugha"""
             session = _ENGINE.sessions.get(from_number)
             order = session.active_order if session and hasattr(session, 'active_order') and session.active_order else None
             if order:
-                message = f"""📋 Muhtasari wa Malipo
+                if session and session.language == Language.EN:
+                    message = f"""📋 Payment Summary
+Service: {order.service_name}
+Price: TZS {order.amount_tzs:,}
+Name: {order.user_name}
+Phone: {order.user_phone}
+
+Payment ID: {order.token}
+
+Send money to:
+- M-Pesa: 123456789
+- Tigo Pesa: 987654321
+- Airtel Money: 456789123
+
+After payment, send 'paid {order.token}'"""
+                else:
+                    message = f"""📋 Muhtasari wa Malipo
 Huduma: {order.service_name}
 Bei: TZS {order.amount_tzs:,}
 Jina: {order.user_name}
@@ -221,6 +237,70 @@ Baada ya malipo, tuma 'paid {order.token}'"""
             logger.info("📤 Sending payment summary...")
             result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             logger.info(f"Payment summary sent: {result}")
+            
+        elif reply == "AWAITING_PAYMENT":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = f"""⏳ Awaiting Payment
+
+Payment ID: {session.active_order.token if session.active_order else 'N/A'}
+
+Options:
+• Send 'paid {session.active_order.token if session.active_order else 'ID'}' to confirm payment
+• Type 'menu' to return to main menu
+• Type 'daktari wa nyumbani' for home doctor
+• Type 'afya ya kazi' for workplace health
+• Type 'dawa na madawa' for pharmacy"""
+            else:
+                message = f"""⏳ Inasubiri Malipo
+
+Namba ya malipo: {session.active_order.token if session.active_order else 'Haijulikani'}
+
+Chaguo:
+• Tuma 'paid {session.active_order.token if session.active_order else 'ID'}' kudhibitisha malipo
+• Andika 'menu' kurudi kwenye menyu kuu
+• Andika 'daktari wa nyumbani' kwa daktari nyumbani
+• Andika 'afya ya kazi' kwa afya ya kazi
+• Andika 'dawa na madawa' kwa duka la dawa"""
+            logger.info("📤 Sending awaiting payment message...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Awaiting payment sent: {result}")
+            
+        elif reply == "PAYMENT_CONFIRMED":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """✅ Payment Confirmed!
+
+Thank you for your payment. Our team will contact you shortly for your appointment.
+
+Type 'menu' to return to main menu for more services."""
+            else:
+                message = """✅ Malipo Yamekamilikiwa!
+
+Asante kwa malipo yako. Timu yetu itakupigia hivi karibu kwa ajendu yako.
+
+Andika 'menu' kurudi kwenye menyu kuu kwa huduma zaidi."""
+            logger.info("📤 Sending payment confirmed message...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Payment confirmed sent: {result}")
+            
+        elif reply == "PAYMENT_ERROR":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """❌ Payment Error
+
+Invalid payment ID or payment not found. Please check the payment ID and try again.
+
+Type 'menu' to return to main menu."""
+            else:
+                message = """❌ Kosa la Malipo
+
+Namba ya malipo si sahihi au haipatikani. Tafadhali thibitisha namba ya malipo ujaribu tena.
+
+Andika 'menu' kurudi kwenye menyu kuu."""
+            logger.info("📤 Sending payment error message...")
+            result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Payment error sent: {result}")
             
         elif reply == "GP_MENU":
             session = _ENGINE.sessions.get(from_number)

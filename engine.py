@@ -65,6 +65,9 @@ class AfyabotEngine:
         
         if session.stage == Stage.COLLECT_PHONE:
             return self._handle_collect_phone(session, msg, is_whatsapp)
+        
+        if session.stage == Stage.AWAITING_PAYMENT:
+            return self._handle_awaiting_payment(session, msg, is_whatsapp)
 
         # Handle main menu navigation
         if session.stage == Stage.MAIN_MENU:
@@ -79,20 +82,22 @@ class AfyabotEngine:
                 session.stage = Stage.SPECIALIST
                 return session.session_id, "SPECIALIST_MENU"
             
-            if msg in {"3", "3)", "home", "home doctor", "daktari nyumbani", "nyumbani"}:
+            if msg in {"3", "3)", "home", "home doctor", "daktari nyumbani"}:
                 session.stage = Stage.HOME_DOCTOR
                 return session.session_id, "HOME_DOCTOR_MENU"
             
-            if msg in {"4", "4)", "corporate", "workplace", "kazini", "mashirika"}:
+            if msg in {"4", "4)", "workplace", "afya ya kazi"}:
                 session.stage = Stage.WORKPLACE
                 return session.session_id, "WORKPLACE_MENU"
             
-            if msg in {"5", "5)", "pharmacy", "dawa", "vifaa"}:
+            if msg in {"5", "5)", "pharmacy", "dawa", "dawa na madawa"}:
                 session.stage = Stage.PHARMACY
                 return session.session_id, "PHARMACY_MENU"
-            
-            # Default to main menu for any other input
-            return session.session_id, "MAIN_MENU"
+
+        # Handle service-specific menu navigation
+        if session.stage in {Stage.GP, Stage.SPECIALIST, Stage.HOME_DOCTOR, Stage.WORKPLACE, Stage.PHARMACY}:
+            if msg in {"menu", "start", "anza", "daktari wa nyumbani", "afya ya kazi", "dawa na madawa"}:
+                return session.session_id, "MAIN_MENU"
 
         # Handle service-specific menus
         if session.stage == Stage.GP:
@@ -172,6 +177,33 @@ class AfyabotEngine:
                 return session.session_id, "PAYMENT_SUMMARY"
         
         return session.session_id, "Kuna tatizo. Tafadhali jaribu tena."
+
+    def _handle_awaiting_payment(self, session: Session, msg: str, is_whatsapp: bool = False) -> Tuple[str, str]:
+        """Handle awaiting payment stage with menu options"""
+        msg_lower = msg.lower().strip()
+        
+        # Check for menu navigation commands
+        if msg_lower in {"menu", "start", "anza", "daktari wa nyumbani", "afya ya kazi", "dawa na madawa"}:
+            return session.session_id, "MAIN_MENU"
+        
+        # Check for payment confirmation
+        if msg_lower.startswith("paid "):
+            payment_token = msg_lower[5:].strip()
+            if session.active_order and session.active_order.token == payment_token:
+                session.active_order.status = 'paid'
+                session.stage = Stage.PAID
+                if is_whatsapp:
+                    return session.session_id, "PAYMENT_CONFIRMED"
+                return session.session_id, "Asante! Malipo yako yamekamilikiwa. Tutakupigia."
+            else:
+                if is_whatsapp:
+                    return session.session_id, "PAYMENT_ERROR"
+                return session.session_id, "Namba ya malipo si sahihi. Tafadhali thibitisha."
+        
+        # Default - stay in awaiting payment
+        if is_whatsapp:
+            return session.session_id, "AWAITING_PAYMENT"
+        return session.session_id, "Subiri malipo..."
 
     def _create_checkout(self, session: Session, service_code: str, service_name: str, amount_tzs: int, channel: str, is_whatsapp: bool = False) -> Tuple[str, str]:
         """Create checkout and start payment flow"""
