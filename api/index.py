@@ -404,7 +404,7 @@ Tunakuja kwako nyumbani:
 3. Mwongozo AMD - TZS 50,000
 4. Tathmini SDA - TZS 30,000
 
-Chagua huduma (1-4)"""
+"""
                 logger.info("📤 Sending Home Doctor menu (SW)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             logger.info(f"Home Doctor menu sent: {result}")
