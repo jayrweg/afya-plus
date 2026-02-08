@@ -113,6 +113,9 @@ async def whatsapp_webhook_post(request: Request):
             sid, reply = response, response  # Fallback for unexpected format
         
         # Handle WhatsApp responses using existing functions
+        logger.info(f"🔍 Processing reply: {reply}")
+        logger.info(f"🔍 Reply type: {type(reply)}")
+        
         if reply == "LANGUAGE_SELECTION":
             # Check if user has chosen language before
             session = _ENGINE.sessions.get(from_number)
@@ -389,7 +392,7 @@ We come to your home:
 3. AMD guidance - TZS 50,000
 4. SDA assessment - TZS 30,000
 
-Choose service (1-4)"""
+We come to your home:"""
                 logger.info("📤 Sending Home Doctor menu (EN)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             else:
@@ -416,7 +419,7 @@ For employees:
 2. Vaccination & screening - TZS 10,000
 3. Health wellness talks - TZS 10,000
 
-Choose service (1-3)"""
+For employees:"""
                 logger.info("📤 Sending Workplace menu (EN)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             else:
@@ -445,7 +448,7 @@ Get medicines & supplies:
 
 Price: TZS 4,000
 
-Send '1' to continue"""
+Get medicines & supplies:"""
                 logger.info("📤 Sending Pharmacy menu (EN)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             else:
@@ -469,27 +472,27 @@ Tuma '1' kuendelea"""
             if session and session.language == Language.EN:
                 message = """🏠 Home Doctor Services
 
-We come to your home:
-1. Quick treatment - TZS 30,000
-2. Medical procedure - TZS 30,000  
-3. AMD guidance - TZS 50,000
-4. SDA assessment - TZS 30,000
-
-Choose service (1-4)"""
-                logger.info("📤 Sending Home Doctor menu (EN)...")
-                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+We come to your home:"""
+                buttons = [
+                    {"id": "1", "title": "Quick - TZS 30,000"},
+                    {"id": "2", "title": "Procedure - TZS 30,000"},
+                    {"id": "3", "title": "AMD - TZS 50,000"},
+                    {"id": "4", "title": "SDA - TZS 30,000"}
+                ]
+                logger.info("📤 Sending Home Doctor buttons (EN)...")
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
             else:
                 message = """🏠 Daktari Nyumbani
 
-Tunakuja kwako nyumbani:
-1. Matibabu ya haraka - TZS 30,000
-2. Matibabu procedure - TZS 30,000  
-3. Mwongozo AMD - TZS 50,000
-4. Tathmini SDA - TZS 30,000
-
-Chagua huduma (1-4)"""
-                logger.info("📤 Sending Home Doctor menu (SW)...")
-                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+Tunakuja kwako nyumbani:"""
+                buttons = [
+                    {"id": "1", "title": "Haraka - TZS 30,000"},
+                    {"id": "2", "title": "Procedure - TZS 30,000"},
+                    {"id": "3", "title": "AMD - TZS 50,000"},
+                    {"id": "4", "title": "SDA - TZS 30,000"}
+                ]
+                logger.info("📤 Sending Home Doctor buttons (SW)...")
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
             logger.info(f"Home Doctor menu sent: {result}")
             
         elif reply == "WORKPLACE_MENU":
@@ -502,7 +505,7 @@ For employees:
 2. Vaccination & screening - TZS 10,000
 3. Health wellness talks - TZS 10,000
 
-Choose service (1-3)"""
+For employees:"""
                 logger.info("📤 Sending Workplace menu (EN)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             else:
@@ -531,7 +534,7 @@ Get medicines & supplies:
 
 Price: TZS 4,000
 
-Send '1' to continue"""
+Get medicines & supplies:"""
                 logger.info("📤 Sending Pharmacy menu (EN)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             else:
