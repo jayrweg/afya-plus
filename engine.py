@@ -61,10 +61,10 @@ class AfyabotEngine:
 
         # Handle payment collection stages
         if session.stage == Stage.COLLECT_NAME:
-            return session.session_id, self._handle_collect_name(session, msg, is_whatsapp)
+            return self._handle_collect_name(session, msg, is_whatsapp)
         
         if session.stage == Stage.COLLECT_PHONE:
-            return session.session_id, self._handle_collect_phone(session, msg, is_whatsapp)
+            return self._handle_collect_phone(session, msg, is_whatsapp)
 
         # Handle main menu navigation
         if session.stage == Stage.MAIN_MENU:
@@ -153,8 +153,9 @@ class AfyabotEngine:
     def _handle_collect_phone(self, session: Session, msg: str, is_whatsapp: bool = False) -> Tuple[str, str]:
         """Handle phone collection for payment"""
         phone = msg.strip()
-        # Basic phone validation for Tanzania
-        if not (phone.startswith("255") or phone.startswith("0") or phone.startswith("+255")):
+        # Accept Tanzania formats and international formats
+        if not (phone.startswith("255") or phone.startswith("0") or phone.startswith("+255") or 
+                phone.startswith("+") and len(phone) >= 10):  # Accept international with +
             if is_whatsapp:
                 return session.session_id, "COLLECT_PHONE_ERROR"
             return session.session_id, "Namba ya simu si sahihi. Tumia namba inaanza na 255, 0, au +255"
