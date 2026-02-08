@@ -40,12 +40,12 @@ class AfyabotEngine:
                 return session.session_id, "LANGUAGE_SELECTION"
             
             # Handle language choice
-            if msg in {"1", "1)", "sw", "swahili", "kiswahili"}:
+            if msg.lower() in {"1", "1)", "sw", "swahili"}:
                 session.language = Language.SW
                 session.stage = Stage.MAIN_MENU
                 return session.session_id, "MAIN_MENU"
             
-            if msg in {"2", "2)", "en", "english"}:
+            if msg.lower() in {"2", "2)", "en", "english"}:
                 session.language = Language.EN
                 session.stage = Stage.MAIN_MENU
                 return session.session_id, "MAIN_MENU"
@@ -54,7 +54,7 @@ class AfyabotEngine:
             return session.session_id, "LANGUAGE_SELECTION"
 
         # Reset session if user sends greeting and already has language (to restart flow)
-        if session.language is not None and msg in {"hi", "hello", "habari", "start", "anza", "menu"}:
+        if session.language is not None and msg.lower() in {"hi", "hello", "habari", "start", "anza", "menu"}:
             session = self.reset(session)
             self._sessions[session.session_id] = session
             return session.session_id, "LANGUAGE_SELECTION"
