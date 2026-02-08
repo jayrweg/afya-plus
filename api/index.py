@@ -473,26 +473,40 @@ Tuma '1' kuendelea"""
                 message = """🏠 Home Doctor Services
 
 We come to your home:"""
-                buttons = [
-                    {"id": "1", "title": "Quick - TZS 30,000"},
-                    {"id": "2", "title": "Procedure - TZS 30,000"},
-                    {"id": "3", "title": "AMD - TZS 50,000"},
-                    {"id": "4", "title": "SDA - TZS 30,000"}
-                ]
-                logger.info("📤 Sending Home Doctor buttons (EN)...")
-                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+                sections = [{
+                    "title": "Doctor Services",
+                    "rows": [
+                        {"id": "1", "title": "Quick - TZS 30,000"},
+                        {"id": "2", "title": "Procedure - TZS 30,000"},
+                        {"id": "3", "title": "AMD - TZS 50,000"},
+                        {"id": "4", "title": "SDA - TZS 30,000"}
+                    ]
+                }]
+                button_text = "Choose service"
+                logger.info("📤 Sending Home Doctor list (EN)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text=button_text)
             else:
                 message = """🏠 Daktari Nyumbani
 
-Tunakuja kwako nyumbani:"""
-                buttons = [
-                    {"id": "1", "title": "Haraka - TZS 30,000"},
-                    {"id": "2", "title": "Procedure - TZS 30,000"},
-                    {"id": "3", "title": "AMD - TZS 50,000"},
-                    {"id": "4", "title": "SDA - TZS 30,000"}
-                ]
-                logger.info("📤 Sending Home Doctor buttons (SW)...")
-                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+Tunakuja kwako nyumbani:
+1. Matibabu ya haraka - TZS 30,000
+2. Matibabu procedure - TZS 30,000  
+3. Mwongozo AMD - TZS 50,000
+4. Tathmini SDA - TZS 30,000
+
+Chagua huduma:"""
+                sections = [{
+                    "title": "Huduma za Daktari",
+                    "rows": [
+                        {"id": "1", "title": "Haraka - TZS 30,000"},
+                        {"id": "2", "title": "Procedure - TZS 30,000"},
+                        {"id": "3", "title": "AMD - TZS 50,000"},
+                        {"id": "4", "title": "SDA - TZS 30,000"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
+                logger.info("📤 Sending Home Doctor list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text=button_text)
             logger.info(f"Home Doctor menu sent: {result}")
             
         elif reply == "WORKPLACE_MENU":
