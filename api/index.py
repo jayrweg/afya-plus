@@ -464,6 +464,92 @@ Tuma '1' kuendelea"""
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
             logger.info(f"Pharmacy menu sent: {result}")
             
+        elif reply == "HOME_DOCTOR_MENU":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """🏠 Home Doctor Services
+
+We come to your home:
+1. Quick treatment - TZS 30,000
+2. Medical procedure - TZS 30,000  
+3. AMD guidance - TZS 50,000
+4. SDA assessment - TZS 30,000
+
+Choose service (1-4)"""
+                logger.info("📤 Sending Home Doctor menu (EN)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            else:
+                message = """🏠 Daktari Nyumbani
+
+Tunakuja kwako nyumbani:
+1. Matibabu ya haraka - TZS 30,000
+2. Matibabu procedure - TZS 30,000  
+3. Mwongozo AMD - TZS 50,000
+4. Tathmini SDA - TZS 30,000
+
+Chagua huduma (1-4)"""
+                logger.info("📤 Sending Home Doctor menu (SW)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Home Doctor menu sent: {result}")
+            
+        elif reply == "WORKPLACE_MENU":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """🏢 Workplace Health Services
+
+For employees:
+1. Pre-employment tests - TZS 10,000
+2. Vaccination & screening - TZS 10,000
+3. Health wellness talks - TZS 10,000
+
+Choose service (1-3)"""
+                logger.info("📤 Sending Workplace menu (EN)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            else:
+                message = """🏢 Afya ya Kazi
+
+Kwa wafanyakazi:
+1. Vipimo kabla ya kazi - TZS 10,000
+2. Chanjo na uchunguzi - TZS 10,000
+3. Mada za afya - TZS 10,000
+
+Chagua huduma (1-3)"""
+                logger.info("📤 Sending Workplace menu (SW)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Workplace menu sent: {result}")
+            
+        elif reply == "PHARMACY_MENU":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                message = """💊 Pharmacy Services
+
+Get medicines & supplies:
+• Doctor prescriptions
+• Medical equipment  
+• Vitamins & supplements
+• Medicine advice
+
+Price: TZS 4,000
+
+Send '1' to continue"""
+                logger.info("📤 Sending Pharmacy menu (EN)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            else:
+                message = """💊 Duka la Dawa
+
+Pata dawa na vifaa:
+• Dawa za daktari
+• Vifaa vya matibabu  
+• Vitamins na supplements
+• Ushauri wa dawa
+
+Bei: TZS 4,000
+
+Tuma '1' kuendelea"""
+                logger.info("📤 Sending Pharmacy menu (SW)...")
+                result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
+            logger.info(f"Pharmacy menu sent: {result}")
+            
         else:
             # Send as text message for now
             logger.info("📤 Sending text message...")

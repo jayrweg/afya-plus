@@ -59,6 +59,18 @@ class AfyabotEngine:
             self._sessions[session.session_id] = session
             return session.session_id, "LANGUAGE_SELECTION"
 
+        # Universal menu navigation - works from any stage
+        if msg in {"menu", "start", "anza"}:
+            return session.session_id, "MAIN_MENU"
+        
+        # Universal service navigation - works from any stage
+        if msg in {"daktari wa nyumbani", "home doctor", "nyumbani"}:
+            return session.session_id, "HOME_DOCTOR_MENU"
+        if msg in {"afya ya kazi", "workplace", "kazini", "mashirika"}:
+            return session.session_id, "WORKPLACE_MENU"
+        if msg in {"dawa na madawa", "pharmacy", "dawa", "vifaa"}:
+            return session.session_id, "PHARMACY_MENU"
+
         # Handle payment collection stages
         if session.stage == Stage.COLLECT_NAME:
             return self._handle_collect_name(session, msg, is_whatsapp)
@@ -179,14 +191,10 @@ class AfyabotEngine:
         return session.session_id, "Kuna tatizo. Tafadhali jaribu tena."
 
     def _handle_awaiting_payment(self, session: Session, msg: str, is_whatsapp: bool = False) -> Tuple[str, str]:
-        """Handle awaiting payment stage with menu options"""
+        """Handle awaiting payment stage - only payment related commands"""
         msg_lower = msg.lower().strip()
         
-        # Check for menu navigation commands
-        if msg_lower in {"menu", "start", "anza", "daktari wa nyumbani", "afya ya kazi", "dawa na madawa"}:
-            return session.session_id, "MAIN_MENU"
-        
-        # Check for payment confirmation
+        # Check for payment confirmation only
         if msg_lower.startswith("paid "):
             payment_token = msg_lower[5:].strip()
             if session.active_order and session.active_order.token == payment_token:
@@ -200,7 +208,7 @@ class AfyabotEngine:
                     return session.session_id, "PAYMENT_ERROR"
                 return session.session_id, "Namba ya malipo si sahihi. Tafadhali thibitisha."
         
-        # Default - stay in awaiting payment
+        # Default - stay in awaiting payment (no menu navigation here)
         if is_whatsapp:
             return session.session_id, "AWAITING_PAYMENT"
         return session.session_id, "Subiri malipo..."
