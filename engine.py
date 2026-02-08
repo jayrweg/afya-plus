@@ -54,22 +54,10 @@ class AfyabotEngine:
             return session.session_id, "LANGUAGE_SELECTION"
 
         # Reset session if user sends greeting and already has language (to restart flow)
-        if session.language is not None and msg in {"hi", "hello", "habari"}:
+        if session.language is not None and msg in {"hi", "hello", "habari", "start", "anza", "menu"}:
             session = self.reset(session)
             self._sessions[session.session_id] = session
             return session.session_id, "LANGUAGE_SELECTION"
-
-        # Universal menu navigation - works from any stage
-        if msg in {"menu", "start", "anza"}:
-            return session.session_id, "MAIN_MENU"
-        
-        # Universal service navigation - works from any stage
-        if msg in {"daktari wa nyumbani", "home doctor", "nyumbani"}:
-            return session.session_id, "HOME_DOCTOR_MENU"
-        if msg in {"afya ya kazi", "workplace", "kazini", "mashirika"}:
-            return session.session_id, "WORKPLACE_MENU"
-        if msg in {"dawa na madawa", "pharmacy", "dawa", "vifaa"}:
-            return session.session_id, "PHARMACY_MENU"
 
         # Handle payment collection stages
         if session.stage == Stage.COLLECT_NAME:
