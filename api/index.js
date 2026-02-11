@@ -74,15 +74,15 @@ module.exports = async function handler(req, res) {
             
             // Handle interactive responses
             if (text === 'swahili') {
-                response = 'Karibu Afyaplus! Nini unahitaji kusaidia?';
+                response = 'Karibu Afyaplus! Nini tunakusaidia?';
             } else if (text === 'english') {
-                response = 'Welcome to Afyaplus! How can we help you today?';
+                response = 'Welcome to Afyaplus! How can we help?';
             } else if (text === 'doctor') {
-                response = 'Doctor consultation selected. Please describe your symptoms and we will connect you with a doctor.';
+                response = 'Doctor selected. Please describe symptoms.';
             } else if (text === 'pharmacy') {
-                response = 'Pharmacy selected. Please tell us what medicine you need or describe your condition.';
+                response = 'Pharmacy selected. What medicine needed?';
             } else if (text === 'emergency') {
-                response = 'Emergency services activated! Please share your location and we will send immediate assistance.';
+                response = 'Emergency! Share location for help.';
             } else {
                 response = 'Say "hi" to start or "menu" for options.';
             }
@@ -101,7 +101,7 @@ module.exports = async function handler(req, res) {
                     interactive: {
                         type: 'button',
                         body: {
-                            text: 'Welcome to Afyaplus! Please select your preferred language:'
+                            text: 'Choose language:'
                         },
                         action: {
                             buttons: [
@@ -133,34 +133,34 @@ module.exports = async function handler(req, res) {
                         type: 'list',
                         header: {
                             type: 'text',
-                            text: 'Afyaplus Services'
+                            text: 'Services'
                         },
                         body: {
-                            text: 'Please select a service from menu:'
+                            text: 'Select service:'
                         },
                         footer: {
-                            text: 'Better health solutions'
+                            text: 'Health solutions'
                         },
                         action: {
-                            button: 'Choose service',
+                            button: 'Choose',
                             sections: [
                                 {
-                                    title: 'Medical Services',
+                                    title: 'Medical',
                                     rows: [
                                         {
                                             id: 'doctor',
-                                            title: 'Doctor Consultation',
-                                            description: 'Talk to a doctor now'
+                                            title: 'Doctor',
+                                            description: 'Talk to doctor'
                                         },
                                         {
                                             id: 'pharmacy',
                                             title: 'Pharmacy',
-                                            description: 'Order medicines and supplies'
+                                            description: 'Order medicines'
                                         },
                                         {
                                             id: 'emergency',
                                             title: 'Emergency',
-                                            description: 'Urgent medical assistance'
+                                            description: 'Urgent help'
                                         }
                                     ]
                                 }
