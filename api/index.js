@@ -71,28 +71,119 @@ module.exports = async function handler(req, res) {
             
             // Simple bot logic
             let response;
-            if (text === 'hi' || text === 'hello' || text === 'habari') {
-                response = 'Hello! Welcome to Afyabot. Say "menu" to see options.';
+            let payloadType = 'text';
+            
+            // Handle interactive responses
+            if (text === 'swahili') {
+                response = 'Karibu Afyaplus! Nini unahitaji kusaidia?';
+            } else if (text === 'english') {
+                response = 'Welcome to Afyaplus! How can we help you today?';
+            } else if (text === 'doctor') {
+                response = 'Doctor consultation selected. Please describe your symptoms and we will connect you with a doctor.';
+            } else if (text === 'pharmacy') {
+                response = 'Pharmacy selected. Please tell us what medicine you need or describe your condition.';
+            } else if (text === 'emergency') {
+                response = 'Emergency services activated! Please share your location and we will send immediate assistance.';
+            } else if (text === 'hi' || text === 'hello' || text === 'habari') {
+                // Send interactive buttons for language selection
+                payloadType = 'button';
             } else if (text === 'menu') {
-                response = 'Choose an option:\n1. Doctor\n2. Pharmacy\n3. Emergency';
-            } else if (text === '1') {
-                response = 'Doctor selected. Please describe your symptoms.';
-            } else if (text === '2') {
-                response = 'Pharmacy selected. What medicine do you need?';
-            } else if (text === '3') {
-                response = 'Emergency! Call 911 immediately.';
+                // Send interactive list menu
+                payloadType = 'list';
             } else {
                 response = 'Say "hi" to start or "menu" for options.';
             }
             
             // Send response
             const url = `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_NUMBER_ID}/messages`;
-            const payload = {
-                messaging_product: 'whatsapp',
-                to: from,
-                type: 'text',
-                text: { body: response }
-            };
+            
+            let payload;
+            
+            if (payloadType === 'list') {
+                // Send interactive list menu
+                payload = {
+                    messaging_product: 'whatsapp',
+                    to: from,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'list',
+                        header: {
+                            type: 'text',
+                            text: 'Afyaplus Services'
+                        },
+                        body: {
+                            text: 'Please select a service from menu:'
+                        },
+                        footer: {
+                            text: 'Better health solutions'
+                        },
+                        action: {
+                            button: 'Choose service',
+                            sections: [
+                                {
+                                    title: 'Medical Services',
+                                    rows: [
+                                        {
+                                            id: 'doctor',
+                                            title: 'Doctor Consultation',
+                                            description: 'Talk to a doctor now'
+                                        },
+                                        {
+                                            id: 'pharmacy',
+                                            title: 'Pharmacy',
+                                            description: 'Order medicines and supplies'
+                                        },
+                                        {
+                                            id: 'emergency',
+                                            title: 'Emergency',
+                                            description: 'Urgent medical assistance'
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                };
+            } else if (payloadType === 'button') {
+                // Send interactive buttons for language selection
+                payload = {
+                    messaging_product: 'whatsapp',
+                    to: from,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'button',
+                        body: {
+                            text: 'Welcome to Afyaplus! Please select your preferred language:'
+                        },
+                        action: {
+                            buttons: [
+                                {
+                                    type: 'reply',
+                                    reply: {
+                                        id: 'swahili',
+                                        title: 'Kiswahili'
+                                    }
+                                },
+                                {
+                                    type: 'reply',
+                                    reply: {
+                                        id: 'english',
+                                        title: 'English'
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                };
+            } else {
+                // Send text response for other messages
+                payload = {
+                    messaging_product: 'whatsapp',
+                    to: from,
+                    type: 'text',
+                    text: { body: response }
+                };
+            }
             
             try {
                 const whatsappResponse = await fetch(url, {
