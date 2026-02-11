@@ -90,7 +90,13 @@ def handler(request):
                 session = _ENGINE.sessions.get(from_number)
                 if session and session.language == Language.EN:
                     header = "Afyaplus Services"
-                    body = """Please select a service from the menu:"""
+                    body = """Please select a service from the menu:
+
+🩺 General Practitioner - Common illnesses treatment
+👨‍⚕️ Specialist Doctor - Specialized medical care  
+🏠 Home Doctor - Doctor visits at home
+🏢 Workplace Health - Corporate health services
+💊 Pharmacy - Medicines & supplies"""
                     footer = "Better health solutions"
                     sections = [{
                         "title": "Medical Services",
@@ -106,7 +112,13 @@ def handler(request):
                     send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
                 else:
                     header = "Huduma za Afyaplus"
-                    body = """Chagua huduma kutoka kwenye menyu:"""
+                    body = """Chagua huduma kutoka kwenye menyu:
+
+🩺 Daktari jumla (GP) - Tibu magonjwa ya kawaida
+👨‍⚕️ Daktari bingwa - Matibabu ya pekee
+🏠 Daktari nyumbani - Daktari anakuja kwako
+🏢 Afya ya kazi - Huduma za afya kazini
+💊 Dawa na madawa - Dawa na vifaa tiba"""
                     footer = "Chaguo bora kwa afya yako"
                     sections = [{
                         "title": "Matibabu",
