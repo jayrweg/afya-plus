@@ -8,7 +8,7 @@ load_dotenv('.env.local')
 # Import WhatsApp functions
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from afyabot.whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
+from whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
 
 def handler(request):
     """Simple Valentine's test bot"""
