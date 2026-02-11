@@ -10,6 +10,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from afyabot.engine import AfyabotEngine
 from afyabot.whatsapp_cloud import send_whatsapp_text, send_whatsapp_buttons, send_whatsapp_list
+from afyabot_types import Language
 
 _ENGINE = AfyabotEngine()
 
@@ -85,19 +86,40 @@ def handler(request):
                 ]
                 send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
             elif reply == "MAIN_MENU":
-                # Send main menu list
-                message = "Afyaplus inakuletea huduma zifuatazo, chagua:\n\nKumbuka: Afyabot hatoi utambuzi rasmi wa ugonjwa. Kwa dharura piga simu huduma ya dharura ya eneo lako mara moja."
-                sections = [{
-                    "title": "Afyabot Services",
-                    "rows": [
-                        {"id": "1", "title": "🩺 Kuwasiliana na daktari jumla (GP)", "description": "Ushauri na matibabu ya magonjwa ya kawaida"},
-                        {"id": "2", "title": "👨‍⚕️ Kuwasiliana na daktari bingwa (Specialist)", "description": "Daktari bingwa kwa huduma maalum"},
-                        {"id": "3", "title": "🏠 Huduma ya daktari nyumbani (Home Doctor)", "description": "Daktari anakuja nyumbani kwako"},
-                        {"id": "4", "title": "🏢 Afya mazingira ya kazi (Corporate)", "description": "Huduma za afya kwa wafanyakazi"},
-                        {"id": "5", "title": "💊 Ushauri/maelekezo ya dawa (Pharmacy)", "description": "Dawa na vifaa tiba"}
-                    ]
-                }]
-                send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections)
+                # Check language and show appropriate menu
+                session = _ENGINE.sessions.get(from_number)
+                if session and session.language == Language.EN:
+                    header = "Afyaplus Services"
+                    body = """Please select a service from the menu:"""
+                    footer = "Better health solutions"
+                    sections = [{
+                        "title": "Medical Services",
+                        "rows": [
+                            {"id": "1", "title": "🩺 General Practitioner", "description": "Common illnesses treatment"},
+                            {"id": "2", "title": "👨‍⚕️ Specialist Doctor", "description": "Specialized medical care"},
+                            {"id": "3", "title": "🏠 Home Doctor", "description": "Doctor visits at home"},
+                            {"id": "4", "title": "🏢 Workplace Health", "description": "Corporate health services"},
+                            {"id": "5", "title": "💊 Pharmacy", "description": "Medicines & supplies"}
+                        ]
+                    }]
+                    button_text = "Choose service"
+                    send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+                else:
+                    header = "Huduma za Afyaplus"
+                    body = """Chagua huduma kutoka kwenye menyu:"""
+                    footer = "Chaguo bora kwa afya yako"
+                    sections = [{
+                        "title": "Matibabu",
+                        "rows": [
+                            {"id": "1", "title": "🩺 Daktari jumla (GP)", "description": "Tibu magonjwa ya kawaida"},
+                            {"id": "2", "title": "👨‍⚕️ Daktari bingwa", "description": "Matibabu ya pekee"},
+                            {"id": "3", "title": "🏠 Daktari nyumbani", "description": "Daktari anakuja kwako"},
+                            {"id": "4", "title": "🏢 Afya ya kazi", "description": "Huduma za afya kazini"},
+                            {"id": "5", "title": "💊 Dawa na madawa", "description": "Dawa na vifaa tiba"}
+                        ]
+                    }]
+                    button_text = "Chagua huduma"
+                    send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
             elif phone_number_id and from_number:
                 send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=reply)
             
