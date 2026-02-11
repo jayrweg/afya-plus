@@ -1,18 +1,1 @@
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "api/index.py"
-    }
-  ],
-  "env": {
-    "PYTHON_VERSION": "3.12"
-  }
-}
+{"version": 2, "builds": [{"src": "api/index.js", "use": "@vercel/node"}], "routes": [{"src": "/(.*)", "dest": "api/index.js"}], "env": {"NODE_VERSION": "18"}}
