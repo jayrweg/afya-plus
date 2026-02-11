@@ -140,40 +140,46 @@ Chagua lugha"""
                     {"id": "2", "title": "English"}
                 ]
             logger.info("📤 Sending language selection buttons...")
-            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+            result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, body=message, buttons=buttons)
             logger.info(f"Buttons sent: {result}")
             
         elif reply == "MAIN_MENU":
             # Check language and show appropriate menu
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
-                message = """Afyaplus offers the following services:"""
+                header = "Afyaplus Services"
+                body = """Please select a service from the menu:"""
+                footer = "Better health solutions"
                 sections = [{
                     "title": "Medical Services",
                     "rows": [
-                        {"id": "1", "title": "🩺 General Practitioner"},
-                        {"id": "2", "title": "👨‍⚕️ Specialist Doctor"},
-                        {"id": "3", "title": "🏠 Home Doctor"},
-                        {"id": "4", "title": "🏢 Workplace Health"},
-                        {"id": "5", "title": "💊 Pharmacy"}
+                        {"id": "1", "title": "🩺 General Practitioner", "description": "Common illnesses treatment"},
+                        {"id": "2", "title": "👨‍⚕️ Specialist Doctor", "description": "Specialized medical care"},
+                        {"id": "3", "title": "🏠 Home Doctor", "description": "Doctor visits at home"},
+                        {"id": "4", "title": "🏢 Workplace Health", "description": "Corporate health services"},
+                        {"id": "5", "title": "💊 Pharmacy", "description": "Medicines & supplies"}
                     ]
                 }]
                 button_text = "Choose service"
+                logger.info("📤 Sending main menu list (EN)...")                
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
             else:
-                message = """Afyaplus inakuletea huduma zifuatazo,chagua"""
+                header = "Huduma za Afyaplus"
+                body = """Chagua huduma kutoka kwenye menyu:"""
+                footer = "Chaguo bora kwa afya yako"
                 sections = [{
                     "title": "Matibabu",
                     "rows": [
-                        {"id": "1", "title": "🩺 Daktari jumla (GP)"},
-                        {"id": "2", "title": "👨‍⚕️ Daktari bingwa"},
-                        {"id": "3", "title": "🏠 Daktari nyumbani"},
-                        {"id": "4", "title": "🏢 Afya ya kazi"},
-                        {"id": "5", "title": "💊 Dawa na madawa"}
+                        {"id": "1", "title": "🩺 Daktari jumla (GP)", "description": "Tibu magonjwa ya kawaida"},
+                        {"id": "2", "title": "👨‍⚕️ Daktari bingwa", "description": "Matibabu ya pekee"},
+                        {"id": "3", "title": "🏠 Daktari nyumbani", "description": "Daktari anakuja kwako"},
+                        {"id": "4", "title": "🏢 Afya ya kazi", "description": "Huduma za afya kazini"},
+                        {"id": "5", "title": "💊 Dawa na madawa", "description": "Dawa na vifaa tiba"}
                     ]
                 }]
                 button_text = "Chagua huduma"
-            logger.info("📤 Sending main menu list...")
-            result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text=button_text)
+                logger.info("📤 Sending main menu list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
             logger.info(f"List sent: {result}")
             
         elif reply == "COLLECT_NAME":
@@ -308,7 +314,7 @@ Andika 'menu' kurudi kwenye menyu kuu."""
         elif reply == "GP_MENU":
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
-                message = """🩺 General Practitioner Services
+                body = """🩺 General Practitioner Services
 
 Treat common illnesses:
 • Acne, Eczema, Allergies
@@ -323,9 +329,9 @@ Choose connection method:"""
                     {"id": "2", "title": "Video - TZS 5,000"}
                 ]
                 logger.info("📤 Sending GP menu buttons (EN)...")
-                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, body=body, buttons=buttons)
             else:
-                message = """🩺 Huduma ya Daktari Jumla (GP)
+                body = """🩺 Huduma ya Daktari Jumla (GP)
 
 Tibu magonjwa ya kawaida:
 • Chunusi, Eczema, Mzio
@@ -340,13 +346,13 @@ Chagua njia:"""
                     {"id": "2", "title": "Video - TZS 5,000"}
                 ]
                 logger.info("📤 Sending GP menu buttons (SW)...")
-                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, body=body, buttons=buttons)
             logger.info(f"GP menu sent: {result}")
             
         elif reply == "SPECIALIST_MENU":
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
-                message = """👨‍⚕️ Specialist Doctor Services
+                body = """👨‍⚕️ Specialist Doctor Services
 
 For long-term conditions:
 • Skin diseases
@@ -361,9 +367,9 @@ Choose connection method:"""
                     {"id": "2", "title": "Video - TZS 30,000"}
                 ]
                 logger.info("📤 Sending Specialist menu buttons (EN)...")
-                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, body=body, buttons=buttons)
             else:
-                message = """👨‍⚕️ Huduma ya Daktari Bingwa
+                body = """👨‍⚕️ Huduma ya Daktari Bingwa
 
 Kwa magonjwa ya muda mrefu:
 • Magonjwa ya ngozi
@@ -378,7 +384,7 @@ Chagua njia:"""
                     {"id": "2", "title": "Video - TZS 30,000"}
                 ]
                 logger.info("📤 Sending Specialist menu buttons (SW)...")
-                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, message=message, buttons=buttons)
+                result = send_whatsapp_buttons(phone_number_id=phone_number_id, to=from_number, body=body, buttons=buttons)
             logger.info(f"Specialist menu sent: {result}")
             
         elif reply == "HOME_DOCTOR_MENU":
@@ -412,6 +418,38 @@ Tunakuja kwako nyumbani:
         elif reply == "WORKPLACE_MENU":
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
+                header = "Workplace Health Services"
+                body = """For employees:"""
+                footer = "Corporate health solutions"
+                sections = [{
+                    "title": "Health Programs",
+                    "rows": [
+                        {"id": "1", "title": "Pre-emp - TZS 10,000", "description": "Pre-employment medical tests"},
+                        {"id": "2", "title": "Screening - TZS 10,000", "description": "Vaccination & health screening"},
+                        {"id": "3", "title": "Wellness - TZS 10,000", "description": "Health wellness talks"}
+                    ]
+                }]
+                button_text = "Choose service"
+                logger.info(" Sending Workplace list (EN)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            else:
+                header = "Afya ya Kazi"
+                body = """Kwa wafanyakazi:"""
+                footer = "Machaguo ya afya kazini"
+                sections = [{
+                    "title": "Programu za Afya",
+                    "rows": [
+                        {"id": "1", "title": "Vipimo - TZS 10,000", "description": "Vipimo kabla ya kazi"},
+                        {"id": "2", "title": "Chanjo - TZS 10,000", "description": "Chanjo na uchunguzi wa afya"},
+                        {"id": "3", "title": "Mada - TZS 10,000", "description": "Mada za afya kwa wafanyakazi"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
+                logger.info(" Sending Workplace list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            logger.info(f"Workplace menu sent: {result}")
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
                 message = """🏢 Workplace Health Services
 
 For employees:
@@ -433,9 +471,77 @@ Kwa wafanyakazi:
 Chagua huduma (1-3)"""
                 logger.info("📤 Sending Workplace menu (SW)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Workplace menu sent: {result}")
+            elif reply == "PHARMACY_MENU":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                header = "Pharmacy Services"
+                body = """Get medicines & supplies:"""
+                footer = "Quality medicines delivered"
+                sections = [{
+                    "title": "Available Items",
+                    "rows": [
+                        {"id": "1", "title": "Prescriptions", "description": "Doctor prescriptions filled"},
+                        {"id": "2", "title": "Medical Equipment", "description": "Medical devices & supplies"},
+                        {"id": "3", "title": "Vitamins", "description": "Vitamins & supplements"},
+                        {"id": "4", "title": "Medicine Advice", "description": "Professional medication guidance"}
+                    ]
+                }]
+                button_text = "Choose service"
+                logger.info(" Sending Pharmacy list (EN)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            else:
+                header = "Duka la Dawa"
+                body = """Pata dawa na vifaa:"""
+                footer = "Dawa bora zinazotumwa"
+                sections = [{
+                    "title": "Vifaa Vinavyopatikana",
+                    "rows": [
+                        {"id": "1", "title": "Dawa za Daktari", "description": "Dawa zilizoandikiwa na daktari"},
+                        {"id": "2", "title": "Vifaa vya Tiba", "description": "Vifaa vya matibabu na vifaa"},
+                        {"id": "3", "title": "Vitamini", "description": "Vitamini na vyakula vyenye lishe"},
+                        {"id": "4", "title": "Usaidizi wa Dawa", "description": "Mashauri ya kitaalamu ya dawa"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
+                logger.info(" Sending Pharmacy list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            logger.info(f"Pharmacy menu sent: {result}")
             
         elif reply == "PHARMACY_MENU":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                header = "Pharmacy Services"
+                body = """Get medicines & supplies:"""
+                footer = "Quality medicines delivered"
+                sections = [{
+                    "title": "Available Items",
+                    "rows": [
+                        {"id": "1", "title": "Prescriptions", "description": "Doctor prescriptions filled"},
+                        {"id": "2", "title": "Medical Equipment", "description": "Medical devices & supplies"},
+                        {"id": "3", "title": "Vitamins", "description": "Vitamins & supplements"},
+                        {"id": "4", "title": "Medicine Advice", "description": "Professional medication guidance"}
+                    ]
+                }]
+                button_text = "Choose service"
+                logger.info(" Sending Pharmacy list (EN)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            else:
+                header = "Duka la Dawa"
+                body = """Pata dawa na vifaa:"""
+                footer = "Dawa bora zinazotumwa"
+                sections = [{
+                    "title": "Vifaa Vinavyopatikana",
+                    "rows": [
+                        {"id": "1", "title": "Dawa za Daktari", "description": "Dawa zilizoandikiwa na daktari"},
+                        {"id": "2", "title": "Vifaa vya Tiba", "description": "Vifaa vya matibabu na vifaa"},
+                        {"id": "3", "title": "Vitamini", "description": "Vitamini na vyakula vyenye lishe"},
+                        {"id": "4", "title": "Usaidizi wa Dawa", "description": "Mashauri ya kitaalamu ya dawa"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
+                logger.info(" Sending Pharmacy list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            logger.info(f"Pharmacy menu sent: {result}")
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
                 message = """💊 Pharmacy Services
@@ -465,53 +571,79 @@ Bei: TZS 4,000
 Tuma '1' kuendelea"""
                 logger.info("📤 Sending Pharmacy menu (SW)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Pharmacy menu sent: {result}")
+            else:
             
         elif reply == "HOME_DOCTOR_MENU":
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
-                message = """🏠 Home Doctor Services
-
-We come to your home:"""
+                header = "Home Doctor Services"
+                body = """We come to your home:"""
+                footer = "Professional medical care at your location"
                 sections = [{
-                    "title": "Doctor Services",
+                    "title": "Available Services",
                     "rows": [
-                        {"id": "1", "title": "Quick - TZS 30,000"},
-                        {"id": "2", "title": "Procedure - TZS 30,000"},
-                        {"id": "3", "title": "AMD - TZS 50,000"},
-                        {"id": "4", "title": "SDA - TZS 30,000"}
+                        {"id": "1", "title": "Quick - TZS 30,000", "description": "Fast treatment for urgent needs"},
+                        {"id": "2", "title": "Procedure - TZS 30,000", "description": "Medical procedures at home"},
+                        {"id": "3", "title": "AMD - TZS 50,000", "description": "AMD guidance and support"},
+                        {"id": "4", "title": "SDA - TZS 30,000", "description": "SDA assessment services"}
                     ]
                 }]
                 button_text = "Choose service"
                 logger.info("📤 Sending Home Doctor list (EN)...")
-                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text=button_text)
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
             else:
-                message = """🏠 Daktari Nyumbani
-
-Tunakuja kwako nyumbani:
-1. Matibabu ya haraka - TZS 30,000
-2. Matibabu procedure - TZS 30,000  
-3. Mwongozo AMD - TZS 50,000
-4. Tathmini SDA - TZS 30,000
-
-Chagua huduma:"""
+                header = "Daktari Nyumbani"
+                body = """Tunakuja kwako nyumbani:"""
+                footer = "Matibabu ya kitaalamu mahali pako"
                 sections = [{
-                    "title": "Huduma za Daktari",
+                    "title": "Huduma Zinapatikana",
                     "rows": [
-                        {"id": "1", "title": "Haraka - TZS 30,000"},
-                        {"id": "2", "title": "Procedure - TZS 30,000"},
-                        {"id": "3", "title": "AMD - TZS 50,000"},
-                        {"id": "4", "title": "SDA - TZS 30,000"}
+                        {"id": "1", "title": "Haraka - TZS 30,000", "description": "Matibabu ya haraka kwa dharura"},
+                        {"id": "2", "title": "Procedure - TZS 30,000", "description": "Matibabu procedure nyumbani"},
+                        {"id": "3", "title": "AMD - TZS 50,000", "description": "Mwongozo AMD na usaidizi"},
+                        {"id": "4", "title": "SDA - TZS 30,000", "description": "Tathmini ya huduma SDA"}
                     ]
                 }]
                 button_text = "Chagua huduma"
                 logger.info("📤 Sending Home Doctor list (SW)...")
-                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, message=message, sections=sections, button_text=button_text)
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
             logger.info(f"Home Doctor menu sent: {result}")
             
         elif reply == "WORKPLACE_MENU":
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
+                header = "Workplace Health Services"
+                body = """For employees:"""
+                footer = "Corporate health solutions"
+                sections = [{
+                    "title": "Health Programs",
+                    "rows": [
+                        {"id": "1", "title": "Pre-emp - TZS 10,000", "description": "Pre-employment medical tests"},
+                        {"id": "2", "title": "Screening - TZS 10,000", "description": "Vaccination & health screening"},
+                        {"id": "3", "title": "Wellness - TZS 10,000", "description": "Health wellness talks"}
+                    ]
+                }]
+                button_text = "Choose service"
+                logger.info(" Sending Workplace list (EN)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            else:
+                header = "Afya ya Kazi"
+                body = """Kwa wafanyakazi:"""
+                footer = "Machaguo ya afya kazini"
+                sections = [{
+                    "title": "Programu za Afya",
+                    "rows": [
+                        {"id": "1", "title": "Vipimo - TZS 10,000", "description": "Vipimo kabla ya kazi"},
+                        {"id": "2", "title": "Chanjo - TZS 10,000", "description": "Chanjo na uchunguzi wa afya"},
+                        {"id": "3", "title": "Mada - TZS 10,000", "description": "Mada za afya kwa wafanyakazi"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
+                logger.info(" Sending Workplace list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            logger.info(f"Workplace menu sent: {result}")
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
                 message = """🏢 Workplace Health Services
 
 For employees:
@@ -533,9 +665,77 @@ Kwa wafanyakazi:
 Chagua huduma (1-3)"""
                 logger.info("📤 Sending Workplace menu (SW)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Workplace menu sent: {result}")
+            elif reply == "PHARMACY_MENU":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                header = "Pharmacy Services"
+                body = """Get medicines & supplies:"""
+                footer = "Quality medicines delivered"
+                sections = [{
+                    "title": "Available Items",
+                    "rows": [
+                        {"id": "1", "title": "Prescriptions", "description": "Doctor prescriptions filled"},
+                        {"id": "2", "title": "Medical Equipment", "description": "Medical devices & supplies"},
+                        {"id": "3", "title": "Vitamins", "description": "Vitamins & supplements"},
+                        {"id": "4", "title": "Medicine Advice", "description": "Professional medication guidance"}
+                    ]
+                }]
+                button_text = "Choose service"
+                logger.info(" Sending Pharmacy list (EN)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            else:
+                header = "Duka la Dawa"
+                body = """Pata dawa na vifaa:"""
+                footer = "Dawa bora zinazotumwa"
+                sections = [{
+                    "title": "Vifaa Vinavyopatikana",
+                    "rows": [
+                        {"id": "1", "title": "Dawa za Daktari", "description": "Dawa zilizoandikiwa na daktari"},
+                        {"id": "2", "title": "Vifaa vya Tiba", "description": "Vifaa vya matibabu na vifaa"},
+                        {"id": "3", "title": "Vitamini", "description": "Vitamini na vyakula vyenye lishe"},
+                        {"id": "4", "title": "Usaidizi wa Dawa", "description": "Mashauri ya kitaalamu ya dawa"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
+                logger.info(" Sending Pharmacy list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            logger.info(f"Pharmacy menu sent: {result}")
             
         elif reply == "PHARMACY_MENU":
+            session = _ENGINE.sessions.get(from_number)
+            if session and session.language == Language.EN:
+                header = "Pharmacy Services"
+                body = """Get medicines & supplies:"""
+                footer = "Quality medicines delivered"
+                sections = [{
+                    "title": "Available Items",
+                    "rows": [
+                        {"id": "1", "title": "Prescriptions", "description": "Doctor prescriptions filled"},
+                        {"id": "2", "title": "Medical Equipment", "description": "Medical devices & supplies"},
+                        {"id": "3", "title": "Vitamins", "description": "Vitamins & supplements"},
+                        {"id": "4", "title": "Medicine Advice", "description": "Professional medication guidance"}
+                    ]
+                }]
+                button_text = "Choose service"
+                logger.info(" Sending Pharmacy list (EN)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            else:
+                header = "Duka la Dawa"
+                body = """Pata dawa na vifaa:"""
+                footer = "Dawa bora zinazotumwa"
+                sections = [{
+                    "title": "Vifaa Vinavyopatikana",
+                    "rows": [
+                        {"id": "1", "title": "Dawa za Daktari", "description": "Dawa zilizoandikiwa na daktari"},
+                        {"id": "2", "title": "Vifaa vya Tiba", "description": "Vifaa vya matibabu na vifaa"},
+                        {"id": "3", "title": "Vitamini", "description": "Vitamini na vyakula vyenye lishe"},
+                        {"id": "4", "title": "Usaidizi wa Dawa", "description": "Mashauri ya kitaalamu ya dawa"}
+                    ]
+                }]
+                button_text = "Chagua huduma"
+                logger.info(" Sending Pharmacy list (SW)...")
+                result = send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
+            logger.info(f"Pharmacy menu sent: {result}")
             session = _ENGINE.sessions.get(from_number)
             if session and session.language == Language.EN:
                 message = """💊 Pharmacy Services
@@ -565,7 +765,7 @@ Bei: TZS 4,000
 Tuma '1' kuendelea"""
                 logger.info("📤 Sending Pharmacy menu (SW)...")
                 result = send_whatsapp_text(phone_number_id=phone_number_id, to=from_number, message=message)
-            logger.info(f"Pharmacy menu sent: {result}")
+            else:
             
         else:
             # Send as text message for now
