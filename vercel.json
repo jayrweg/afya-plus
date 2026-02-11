@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/whatsapp.py",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/whatsapp.py"
+      "dest": "api/index.py"
     }
   ],
   "env": {
