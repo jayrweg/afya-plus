@@ -71,7 +71,6 @@ module.exports = async function handler(req, res) {
             
             // Simple bot logic
             let response;
-            let payloadType = 'text';
             
             // Handle interactive responses
             if (text === 'swahili') {
@@ -84,12 +83,6 @@ module.exports = async function handler(req, res) {
                 response = 'Pharmacy selected. Please tell us what medicine you need or describe your condition.';
             } else if (text === 'emergency') {
                 response = 'Emergency services activated! Please share your location and we will send immediate assistance.';
-            } else if (text === 'hi' || text === 'hello' || text === 'habari') {
-                // Send interactive buttons for language selection
-                payloadType = 'button';
-            } else if (text === 'menu') {
-                // Send interactive list menu
-                payloadType = 'list';
             } else {
                 response = 'Say "hi" to start or "menu" for options.';
             }
@@ -99,7 +92,38 @@ module.exports = async function handler(req, res) {
             
             let payload;
             
-            if (payloadType === 'list') {
+            if (text === 'hi' || text === 'hello' || text === 'habari') {
+                // Send interactive buttons for language selection
+                payload = {
+                    messaging_product: 'whatsapp',
+                    to: from,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'button',
+                        body: {
+                            text: 'Welcome to Afyaplus! Please select your preferred language:'
+                        },
+                        action: {
+                            buttons: [
+                                {
+                                    type: 'reply',
+                                    reply: {
+                                        id: 'swahili',
+                                        title: 'Kiswahili'
+                                    }
+                                },
+                                {
+                                    type: 'reply',
+                                    reply: {
+                                        id: 'english',
+                                        title: 'English'
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                };
+            } else if (text === 'menu') {
                 // Send interactive list menu
                 payload = {
                     messaging_product: 'whatsapp',
@@ -139,37 +163,6 @@ module.exports = async function handler(req, res) {
                                             description: 'Urgent medical assistance'
                                         }
                                     ]
-                                }
-                            ]
-                        }
-                    }
-                };
-            } else if (payloadType === 'button') {
-                // Send interactive buttons for language selection
-                payload = {
-                    messaging_product: 'whatsapp',
-                    to: from,
-                    type: 'interactive',
-                    interactive: {
-                        type: 'button',
-                        body: {
-                            text: 'Welcome to Afyaplus! Please select your preferred language:'
-                        },
-                        action: {
-                            buttons: [
-                                {
-                                    type: 'reply',
-                                    reply: {
-                                        id: 'swahili',
-                                        title: 'Kiswahili'
-                                    }
-                                },
-                                {
-                                    type: 'reply',
-                                    reply: {
-                                        id: 'english',
-                                        title: 'English'
-                                    }
                                 }
                             ]
                         }
