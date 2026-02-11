@@ -90,44 +90,72 @@ def handler(request):
                 session = _ENGINE.sessions.get(from_number)
                 if session and session.language == Language.EN:
                     header = "Afyaplus Services"
-                    body = """Please select a service from the menu:
-
-🩺 General Practitioner - Common illnesses treatment
-👨‍⚕️ Specialist Doctor - Specialized medical care  
-🏠 Home Doctor - Doctor visits at home
-🏢 Workplace Health - Corporate health services
-💊 Pharmacy - Medicines & supplies"""
+                    body = "Please select an option from the menu:"
                     footer = "Better health solutions"
                     sections = [{
                         "title": "Medical Services",
                         "rows": [
-                            {"id": "1", "title": "🩺 General Practitioner", "description": "Common illnesses treatment"},
-                            {"id": "2", "title": "👨‍⚕️ Specialist Doctor", "description": "Specialized medical care"},
-                            {"id": "3", "title": "🏠 Home Doctor", "description": "Doctor visits at home"},
-                            {"id": "4", "title": "🏢 Workplace Health", "description": "Corporate health services"},
-                            {"id": "5", "title": "💊 Pharmacy", "description": "Medicines & supplies"}
+                            {
+                                "id": "1",
+                                "title": "General Practitioner",
+                                "description": "Common illnesses treatment"
+                            },
+                            {
+                                "id": "2", 
+                                "title": "Specialist Doctor",
+                                "description": "Specialized medical care"
+                            },
+                            {
+                                "id": "3",
+                                "title": "Home Doctor", 
+                                "description": "Doctor visits at home"
+                            },
+                            {
+                                "id": "4",
+                                "title": "Workplace Health",
+                                "description": "Corporate health services"
+                            },
+                            {
+                                "id": "5",
+                                "title": "Pharmacy",
+                                "description": "Medicines & supplies"
+                            }
                         ]
                     }]
                     button_text = "Choose service"
                     send_whatsapp_list(phone_number_id=phone_number_id, to=from_number, header=header, body=body, footer=footer, sections=sections, button_text=button_text)
                 else:
                     header = "Huduma za Afyaplus"
-                    body = """Chagua huduma kutoka kwenye menyu:
-
-🩺 Daktari jumla (GP) - Tibu magonjwa ya kawaida
-👨‍⚕️ Daktari bingwa - Matibabu ya pekee
-🏠 Daktari nyumbani - Daktari anakuja kwako
-🏢 Afya ya kazi - Huduma za afya kazini
-💊 Dawa na madawa - Dawa na vifaa tiba"""
+                    body = "Chagua huduma kutoka kwenye menyu:"
                     footer = "Chaguo bora kwa afya yako"
                     sections = [{
                         "title": "Matibabu",
                         "rows": [
-                            {"id": "1", "title": "🩺 Daktari jumla (GP)", "description": "Tibu magonjwa ya kawaida"},
-                            {"id": "2", "title": "👨‍⚕️ Daktari bingwa", "description": "Matibabu ya pekee"},
-                            {"id": "3", "title": "🏠 Daktari nyumbani", "description": "Daktari anakuja kwako"},
-                            {"id": "4", "title": "🏢 Afya ya kazi", "description": "Huduma za afya kazini"},
-                            {"id": "5", "title": "💊 Dawa na madawa", "description": "Dawa na vifaa tiba"}
+                            {
+                                "id": "1",
+                                "title": "Daktari jumla (GP)",
+                                "description": "Tibu magonjwa ya kawaida"
+                            },
+                            {
+                                "id": "2",
+                                "title": "Daktari bingwa",
+                                "description": "Matibabu ya pekee"
+                            },
+                            {
+                                "id": "3",
+                                "title": "Daktari nyumbani",
+                                "description": "Daktari anakuja kwako"
+                            },
+                            {
+                                "id": "4",
+                                "title": "Afya ya kazi",
+                                "description": "Huduma za afya kazini"
+                            },
+                            {
+                                "id": "5",
+                                "title": "Dawa na madawa",
+                                "description": "Dawa na vifaa tiba"
+                            }
                         ]
                     }]
                     button_text = "Chagua huduma"
