@@ -1,12 +1,18 @@
 // Simple WhatsApp webhook for testing
-require('dotenv').config();
 
 const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 const WHATSAPP_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     try {
+        // Check if environment variables are set
+        if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_VERIFY_TOKEN || !WHATSAPP_PHONE_NUMBER_ID) {
+            console.error('Missing environment variables');
+            res.status(500).json({ error: 'Server configuration error' });
+            return;
+        }
+        
         // Webhook verification
         if (req.method === 'GET') {
             const mode = req.query['hub.mode'];
