@@ -94,16 +94,21 @@ module.exports = async function handler(req, res) {
                 text: { body: response }
             };
             
-            const whatsappResponse = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-            
-            console.log('WhatsApp response:', await whatsappResponse.json());
+            try {
+                const whatsappResponse = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await whatsappResponse.json();
+                console.log('WhatsApp response:', result);
+            } catch (fetchError) {
+                console.error('Fetch error:', fetchError);
+            }
             
             res.status(200).json({ ok: true, message: 'Response sent' });
             return;
